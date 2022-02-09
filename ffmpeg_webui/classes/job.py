@@ -11,7 +11,7 @@ class TranscodeJob:
         self.out_folder = out_folder
         self.preset = preset
         self.status = "init"
-        self.percentageComplete = 0
+        self.float_complete = 0.0
 
     def __repr__(self):
         return "TranscodeJob()"
