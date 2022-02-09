@@ -6,7 +6,7 @@ from preset import Preset
 
 class TranscodeJob:
     
-    def __init__(self, in_files, out_folder, preset):
+    def __init__(self, in_files: list, out_folder: Path, preset: Preset):
         self.in_files = in_files
         self.out_folder = out_folder
         self.preset = preset
@@ -16,8 +16,8 @@ class TranscodeJob:
     def __repr__(self):
         return "TranscodeJob()"
 
-    def __str__(self, indent=None):
-        return json.dumps(self, indent)
+    def __str__(self):
+        return json.dumps(self)
 
     def run(self):
         pass
