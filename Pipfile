@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
+ffmpeg-python = "*"
 
 [dev-packages]
 
