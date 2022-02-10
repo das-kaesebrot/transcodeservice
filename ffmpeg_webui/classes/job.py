@@ -10,8 +10,8 @@ class TranscodeJob:
     SUCCESS = 3
     FAILED = 4
     
-    def __init__(self, in_file: Path, out_folder: Path, preset_id: UUID):
-        self._id = None
+    def __init__(self, id: UUID, in_file: Path, out_folder: Path, preset_id: UUID):
+        self._id = id
         self._in_files = in_file
         self._out_folder = out_folder
         self._status = TranscodeJob.CREATED

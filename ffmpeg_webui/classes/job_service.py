@@ -27,10 +27,15 @@ class TranscodejobService:
     def get_all_jobs(self):
         return list(self._collection.find())
 
-    def insert_job(self, job: TranscodeJob):
-        job._id = self._generateUUID()
-        job.update_modified()
-        return self._collection.insert_one(job)
+    def insert_job(self, in_file: Path, out_folder: Path, preset_id: UUID):
+        return self._collection.insert_one(
+            TranscodeJob(
+                id = self._generateUUID(),
+                in_file = in_file,
+                out_folder = out_folder,
+                preset_id = preset_id
+            )
+        )
     
     def delete_job(self, job_id: UUID):
         return self._collection.delete_one({
