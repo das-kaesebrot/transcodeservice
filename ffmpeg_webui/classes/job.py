@@ -1,9 +1,7 @@
-# Definition file for the Job class, representing a single job object
-import json
-import uuid
-from enum import Enum
+# Definition file for the TranscodeJob class, representing a single job object
+import json, datetime
 from pathlib import Path
-from preset import Preset
+from uuid import UUID
 
 
 class TranscodeJob(Enum):
@@ -12,13 +10,14 @@ class TranscodeJob(Enum):
     SUCCESS = 3
     FAILED = 4
     
-    def __init__(self, in_file: Path, out_folder: Path, preset_id: uuid.UUID):
-        self.in_files = in_file
-        self.out_folder = out_folder
-        self.preset_id = preset_id
-        self.status = TranscodeJob.CREATED
-        self.float_complete = 0.0
-        self.id = self._generateUUID()
+    def __init__(self, in_file: Path, out_folder: Path, preset_id: UUID):
+        self._id = None
+        self._in_files = in_file
+        self._out_folder = out_folder
+        self._status = TranscodeJob.CREATED
+        self._float_complete: float = 0.0
+        self._created_at = datetime.datetime.utcnow()
+        self._preset_id = UUID
 
     def __repr__(self):
         return "TranscodeJob()"
