@@ -25,13 +25,6 @@ class TranscodeJob(Enum):
 
     def __str__(self):
         return json.dumps(self)
-    
-    # TODO declare global database connection object
-    def _generateUUID(self):
-        while True:
-            _ = uuid.uuid4()
-            if _ not in db_conn.get_job_ids():
-                return _
 
     def run(self):
         pass
