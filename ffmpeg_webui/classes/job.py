@@ -31,5 +31,11 @@ class TranscodeJob:
     def abort(self):
         pass
 
-    def getStatus(self):
-        return self.status
+    def get_status(self):
+        return self._status
+
+    def get_completion_status(self):
+        return self._float_complete
+
+    def update_modified(self):
+        self._modified_at = datetime.datetime.utcnow()
