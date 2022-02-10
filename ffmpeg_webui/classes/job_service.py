@@ -70,13 +70,8 @@ class TranscodejobService:
 
     def clear_job_history(self):
         self._collection.delete_many({
-            "$or": [
-                {
-                    "_status": TranscodeJob.SUCCESS
-                },
-                {
-                    "_status": TranscodeJob.FAILED
-                }
-            ]})
-
+            "_status": {
+                "$in" : [TranscodeJob.SUCCESS, TranscodeJob.FAILED]
+            }
+        })
     
