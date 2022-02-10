@@ -4,7 +4,7 @@ from pathlib import Path
 from uuid import UUID
 
 
-class TranscodeJob(Enum):
+class TranscodeJob:
     CREATED = 1
     RUNNING = 2
     SUCCESS = 3
