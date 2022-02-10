@@ -2,12 +2,12 @@ from uuid import UUID, uuid4
 from ffmpeg_webui.classes.db import DB
 from ffmpeg_webui.classes.job import TranscodeJob
 
-class JobService:
+class TranscodejobService:
 
-    collection = "jobs"
+    COLLECTION = "transcodejobs"
 
     def __init__(self, db: DB.db):
-        self._collection = db[JobService.collection]
+        self._collection = db[TranscodejobService.COLLECTION]
     
         
     def _generateUUID(self):
