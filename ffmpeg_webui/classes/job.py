@@ -17,6 +17,7 @@ class TranscodeJob:
         self._status = TranscodeJob.CREATED
         self._float_complete: float = 0.0
         self._created_at = datetime.datetime.utcnow()
+        self._created_at = self._modified_at
         self._preset_id = UUID
 
     def __repr__(self):
