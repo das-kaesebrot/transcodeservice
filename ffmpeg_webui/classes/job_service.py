@@ -1,3 +1,4 @@
+from pathlib import Path
 from uuid import UUID, uuid4
 from ffmpeg_webui.classes.db import DB
 from ffmpeg_webui.classes.job import TranscodeJob
@@ -18,6 +19,7 @@ class TranscodejobService:
             }):
                 return _
 
+
     def get_job_by_id(self, job_id: UUID):
         return self._collection.find_one({
             "_id": job_id
@@ -26,6 +28,11 @@ class TranscodejobService:
 
     def get_all_jobs(self):
         return list(self._collection.find())
+    
+    def get_running_jobs(self):
+        return list(self._collection.find({
+            "_status": TranscodeJob.RUNNING
+        }))
 
     def insert_job(self, in_file: Path, out_folder: Path, preset_id: UUID):
         return self._collection.insert_one(
