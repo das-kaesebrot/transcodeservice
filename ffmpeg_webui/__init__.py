@@ -2,7 +2,7 @@ import logging
 import os
 from flask import Flask
 from ffmpeg_webui.classes.db import DB
-from ffmpeg_webui.classes.job_service import JobService
+from ffmpeg_webui.classes.job_service import TranscodejobService
 from ffmpeg_webui.classes.config import Config
 
 app = Flask(__name__)
@@ -26,6 +26,6 @@ def bootstrap_app():
         logging.debug("Verbose output enabled")
 
     # Initialize database connection
-    db = DB(username=config.username, password=config.password, hostname = config.hostname if config.hostname)
+    db = DB(username=config.username, password=config.password, hostname = config.hostname)
 
 bootstrap_app()
