@@ -20,7 +20,7 @@ class DB:
         ):
 
         self._client = MongoClient(
-                uri = "mongodb://%s:%s@%s:%i" % (
+                host = "mongodb://%s:%s@%s:%i" % (
                     
                     # In order to be able to connect using a username and password,
                     # we need to percent encode those paramter to avoid overwriting
