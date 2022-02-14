@@ -11,14 +11,14 @@ class TranscodeJob:
     FAILED = 4
     
     def __init__(self, id: UUID, in_file: Path, out_folder: Path, preset_id: UUID):
-        self._id = id
-        self._in_files = in_file
-        self._out_folder = out_folder
+        self._id: UUID = id
+        self._in_files: Path = in_file
+        self._out_folder: Path = out_folder
         self._status = TranscodeJob.CREATED
         self._float_complete: float = 0.0
         self._created_at = datetime.datetime.utcnow()
         self._created_at = self._modified_at
-        self._preset_id = UUID
+        self._preset_id: UUID = preset_id
 
     def __repr__(self):
         return "TranscodeJob()"
