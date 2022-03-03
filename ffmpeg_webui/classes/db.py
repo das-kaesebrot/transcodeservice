@@ -10,17 +10,17 @@ class DB:
     
     def __init__(
             self,
-            username: str,
-            password: str,
+            username: str = None,
+            password: str = None,
             hostname: str = "localhost",
             port: int = 27017,
             database: str = "ffmpeg_webui_db",
             tz_aware: bool = True,
             connect: bool = True
         ):
-
-        self._client = MongoClient(
-                host = "mongodb://%s:%s@%s:%i" % (
+        
+        if username:
+            host = "mongodb://%s:%s@%s:%i" % (
                     
                     # In order to be able to connect using a username and password,
                     # we need to percent encode those paramter to avoid overwriting
@@ -30,7 +30,14 @@ class DB:
                     quote_plus(password),
                     hostname,
                     port
-                ),
+                )
+        else: host = "mongodb://%s:%i" % (                    
+                    hostname,
+                    port
+                )
+        
+        self._client = MongoClient(
+                host = host,
                 tz_aware = tz_aware,
                 connect = connect,
                 appname = "ffmpeg_webui"
