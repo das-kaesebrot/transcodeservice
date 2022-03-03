@@ -19,13 +19,23 @@ def bootstrap_app():
     config = Config()
 
     logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s', level=logging.INFO)
+    
+    config.hostname = "mongodb"
+    
+    # CHANGE THIS IN PROD
+    debug = True
 
     # TODO fix logging config
     if config.verbose:
         logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s', level=logging.DEBUG)
         logging.debug("Verbose output enabled")
 
+    db = None
+
     # Initialize database connection
-    db = DB(username=config.username, password=config.password, hostname = config.hostname)
+    if debug:
+        db = DB(hostname = config.hostname)
+    else:
+        db = DB(username=config.username, password=config.password, hostname = config.hostname)
 
 bootstrap_app()
