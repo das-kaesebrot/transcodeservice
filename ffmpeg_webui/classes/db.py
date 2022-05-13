@@ -20,6 +20,7 @@ class DB:
         database = getattr(conf, "db_database", "ffmpeg_webui_db")
         tz_aware = getattr(conf, "db_tz_aware", True)
         connect = True
+        uuidRepresentation = 'standard'
         
         if username:
             host = "mongodb://%s:%s@%s:%i" % (
@@ -42,7 +43,8 @@ class DB:
                 host = host,
                 tz_aware = tz_aware,
                 connect = connect,
-                appname = "ffmpeg_webui"
+                appname = "ffmpeg_webui",
+                uuidRepresentation = uuidRepresentation
             )
         
         self.database = self._client[database]
