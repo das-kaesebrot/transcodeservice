@@ -7,8 +7,9 @@ class TranscodejobService:
 
     COLLECTION = "transcodejobs"
 
-    def __init__(self, db: DB):
-        self._collection = db.db[TranscodejobService.COLLECTION]
+    def __init__(self):
+        db = DB()
+        self._collection = db.database[TranscodejobService.COLLECTION]
     
         
     def _generateUUID(self):
