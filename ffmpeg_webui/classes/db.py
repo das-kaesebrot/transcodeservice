@@ -1,23 +1,25 @@
-import logging, sys
+import sys
+from ffmpeg_webui.classes.config import Config
+from ffmpeg_webui import app
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from pymongo.errors import ConnectionFailure
+from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 # This is the database initilization class.
-# 
 
 class DB:
     
-    def __init__(
-            self,
-            username: str = None,
-            password: str = None,
-            hostname: str = "localhost",
-            port: int = 27017,
-            database: str = "ffmpeg_webui_db",
-            tz_aware: bool = True,
-            connect: bool = True
-        ):
+    def __init__(self):
+                
+        conf = Config()
+                        
+        username = getattr(conf, "db_user", None)
+        password = getattr(conf, "db_pass", None)
+        hostname = getattr(conf, "db_hostname", "localhost")
+        port = getattr(conf, "db_port", 27017)
+        database = getattr(conf, "db_database", "ffmpeg_webui_db")
+        tz_aware = getattr(conf, "db_tz_aware", True)
+        connect = True
         
         if username:
             host = "mongodb://%s:%s@%s:%i" % (
@@ -42,14 +44,17 @@ class DB:
                 connect = connect,
                 appname = "ffmpeg_webui"
             )
-        self.db = (self._client, database)
+        
+        self.database = self._client[database]
 
+        app.logger.debug(f"Trying conn with {host}")
         self._try_connection()
+        app.logger.debug(f"Connected to {host}")
 
 
     def _try_connection(self):
         try:
             self._client.admin.command('ping')
-        except ConnectionFailure:
-            logging.error("MongoDB server at %s not available" % self._client.server_info())
+        except ConnectionFailure or ServerSelectionTimeoutError:
+            app.logger.error("MongoDB server at %s not available" % self._client.server_info())
             sys.exit(1)
