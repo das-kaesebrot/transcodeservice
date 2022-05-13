@@ -1,22 +1,11 @@
 from http import HTTPStatus
 import json
+from ffmpeg_webui import app
 from flask import Blueprint, jsonify, Response
 from ffmpeg_webui.classes.job_service import TranscodejobService
 
 # REST API routes
 rest_api = Blueprint('rest_api', __name__)
-resp = Response(
-    status = HTTPStatus.INTERNAL_SERVER_ERROR,
-    headers = {
-        "content-type": "application/json"
-    }
-)
-resp_err = Response(
-    status = HTTPStatus.INTERNAL_SERVER_ERROR,
-    headers = {
-        "content-type": "application/json"
-    }
-)
 
 ROUTE_JOBS = "jobs"
 _jobService = TranscodejobService()
@@ -38,18 +27,30 @@ def GetJob(jobId):
     try:
         result = _jobService.get_job_by_id(jobId)
         if not result:
-            resp_err.status = HTTPStatus.NOT_FOUND
-            resp_err.data = json.dumps({
-                "success": False,
-                "error": "not found"
-            })
-            return resp_err
-        resp.status = HTTPStatus.OK
-        resp.data = json.dumps(result)
-        return resp
+            return ConstructErrorResponse(Exception("Not found"), HTTPStatus.NOT_FOUND)
+        return ConstructResponse(result)
     except Exception as e:
-        resp_err.data = json.dumps({
-            "error": type(e).__name__,
-            "message": e.args
-        })
-        return resp_err
+        app.logger.error(f"{e=}")
+        return ConstructErrorResponse(e)
+
+
+def ConstructResponse(data, status: HTTPStatus = HTTPStatus.OK) -> Response:
+    return Response(
+        response = json.dumps(data),
+        status = status,
+        headers = {
+            "content-type": "application/json"
+        }
+    )
+
+def ConstructErrorResponse(exception: Exception, status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR) -> Response:
+    return Response(
+        response = json.dumps({
+            "error": type(exception).__name__,
+            "message": str(exception)
+        }),
+        status = status,
+        headers = {
+            "content-type": "application/json"
+        }
+    )
