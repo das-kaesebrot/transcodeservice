@@ -12,18 +12,11 @@ class Config:
         self.password = None
         self.hostname = None
         
-        if path:
-            self._read_config_file(path)
-        self._read_env()
-
-    # TODO read in config file
-    def _read_config_file(self, path):
-        _ = {}
-        with open("config.json") as f:
+        app.logger.debug("Entered config setting")
+        
+        _ = None
             _ = json.load(f)
         
         pass
 
-    # TODO have env vars always override config file
-    def _read_env(self):
-        pass
+            app.logger.debug(f"Set var \"{var}\": {getattr(self, var)}")
