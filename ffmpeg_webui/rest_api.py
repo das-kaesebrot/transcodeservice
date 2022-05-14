@@ -4,14 +4,14 @@ from pathlib import Path
 from uuid import UUID
 from ffmpeg_webui import app
 from flask import Blueprint, request, jsonify
-from ffmpeg_webui.classes.job_service import TranscodejobService
+from ffmpeg_webui.classes.job_service import TranscodeJobService
 from ffmpeg_webui.classes.responsehandler import ResponseHandler
 
 # REST API routes
 rest_api = Blueprint('rest_api', __name__)
 
 ROUTE_JOBS = "jobs"
-_jobService = TranscodejobService()
+_jobService = TranscodeJobService()
 _handler = ResponseHandler()
 
 @rest_api.route('/')
