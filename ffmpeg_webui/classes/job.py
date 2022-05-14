@@ -1,5 +1,6 @@
 # Definition file for the TranscodeJob class, representing a single job object
 import json, datetime
+import ffmpeg
 from pathlib import Path
 from uuid import UUID
 
@@ -11,6 +12,7 @@ class TranscodeJob:
     FAILED = 4
     
     def __init__(self, id: UUID, in_file: Path, out_folder: Path, preset_id: UUID):
+        
         self._id: UUID = id
         self._in_files: Path = in_file
         self._out_folder: Path = out_folder
