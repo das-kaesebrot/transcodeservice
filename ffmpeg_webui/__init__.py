@@ -6,14 +6,30 @@ from flask import Flask
 app = Flask(__name__)
 
 from ffmpeg_webui import routes_ui, rest_api
-from ffmpeg_webui.classes.db import DB
-from ffmpeg_webui.classes.job_service import TranscodejobService
 from ffmpeg_webui.classes.config import Config
 from logging.config import dictConfig
 from flask.logging import default_handler
+from pymongo import results
 
 root = logging.getLogger()
 root.addHandler(default_handler)
+
+from json import JSONEncoder
+from uuid import UUID
+
+old_default = JSONEncoder.default
+
+def new_default(self, obj):
+    if isinstance(obj, UUID):
+        return str(obj)
+    elif isinstance(obj, results.InsertOneResult):
+        return {
+            "acknowledged": getattr(obj, "acknowledged"),
+            "inserted_id": getattr(obj, "inserted_id")
+        }
+    return old_default(self, obj)
+
+JSONEncoder.default = new_default
 
 API_VERSION = 1
 
