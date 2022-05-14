@@ -2,6 +2,7 @@ import json
 import traceback
 from http import HTTPStatus
 from flask import Response
+from ffmpeg_webui import app
 
 class ResponseHandler:
     
@@ -20,12 +21,16 @@ class ResponseHandler:
         )
 
     def ConstructErrorResponse(self, exception: Exception, status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR) -> Response:
-        return Response(
-            response = json.dumps({
+        app.logger.error(f"{exception}")
+        response = {
                 "error": type(exception).__name__,
-                "message": str(exception),
-                "traceback": ''.join(traceback.TracebackException.from_exception(exception).stack.format())
-            }),
+                "message": str(exception)
+        }
+        
+        if app.debug:
+            response["traceback"] = ''.join(traceback.TracebackException.from_exception(exception).stack.format())
+        return Response(
+            response = json.dumps(response),
             status = status,
             headers = {
                 "content-type": self.__CONTENT_TYPE__
