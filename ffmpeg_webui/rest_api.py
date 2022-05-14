@@ -5,13 +5,17 @@ from uuid import UUID
 from ffmpeg_webui import app
 from flask import Blueprint, request, jsonify
 from ffmpeg_webui.classes.job_service import TranscodeJobService
+from ffmpeg_webui.classes.preset import Preset
+from ffmpeg_webui.classes.preset_service import PresetService
 from ffmpeg_webui.classes.responsehandler import ResponseHandler
 
 # REST API routes
 rest_api = Blueprint('rest_api', __name__)
 
 ROUTE_JOBS = "jobs"
+ROUTE_PRESETS = "presets"
 _jobService = TranscodeJobService()
+_presetService = PresetService()
 _handler = ResponseHandler()
 
 @rest_api.route('/')
@@ -52,3 +56,32 @@ def CreateJob():
         app.logger.error(f"{e=}")
         return _handler.ConstructErrorResponse(e)
 
+
+@rest_api.route(f"{ROUTE_PRESETS}", methods=['GET'])
+def GetAllPresets():
+    try:
+        result = _presetService.get_all_presets()
+        return _handler.ConstructResponse(result)
+    except Exception as e:
+        app.logger.error(f"{e=}")
+        return _handler.ConstructErrorResponse(e)
+    
+@rest_api.route(f"{ROUTE_PRESETS}/<id>", methods=['GET'])
+def GetPreset(id):
+    try:
+        result = _presetService.get_preset_by_id(id)
+        return _handler.ConstructResponse(result)
+    except Exception as e:
+        app.logger.error(f"{e=}")
+        return _handler.ConstructErrorResponse(e)
+
+@rest_api.route(f"{ROUTE_PRESETS}", methods=['POST'])
+def InsertPreset():
+    try:
+        request_data = request.get_json()
+        preset = Preset(request_data, True)
+        result = _presetService.insert_preset(preset)
+        return _handler.ConstructResponse(result)
+    except Exception as e:
+        app.logger.error(f"{e=}")
+        return _handler.ConstructErrorResponse(e)
