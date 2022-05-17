@@ -1,6 +1,4 @@
 from http import HTTPStatus
-import json
-from pathlib import Path
 from uuid import UUID
 from ffmpeg_webui import app
 from flask import Blueprint, request, jsonify
