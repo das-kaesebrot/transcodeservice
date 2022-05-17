@@ -6,7 +6,7 @@ from pathlib import Path
 class Config:
     FILENAME = "config.json"
     ENV_PREFIX = "FFMPEG_WEBUI"
-    ACCEPTED_VARS = ["verbose", "db_hostname", "db_pass", "db_user", "db_port"]
+    ACCEPTED_VARS = ["debug", "db_hostname", "db_pass", "db_user", "db_port", "db_debug_mode"]
     
     def __init__(self, path: str = ""):
         

@@ -55,10 +55,7 @@ app.register_blueprint(rest_api.rest_api, url_prefix=f'/api/v{API_VERSION}')
 def bootstrap_app():
     config = Config()
     
-    # CHANGE THIS IN PROD
-    debug = True
-    
-    if config.verbose or debug:
+    if config.debug:
         app.logger.setLevel(logging.DEBUG)
         app.logger.debug("Verbose output enabled")
 

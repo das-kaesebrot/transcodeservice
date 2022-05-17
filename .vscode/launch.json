@@ -13,7 +13,7 @@
                 "FLASK_APP": "ffmpeg_webui",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1",
-                "FFMPEG_WEBUI_VERBOSE": "true",
+                "FFMPEG_WEBUI_DEBUG": "true",
             },
             "args": [
                 "run",
