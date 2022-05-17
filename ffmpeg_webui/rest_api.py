@@ -34,7 +34,7 @@ class Index(Resource):
         })
         
 @api.route(f"{ROUTE_JOBS}/<jobId>")
-class GetJob(Resource):
+class SingleJob(Resource):
     def get(self, jobId):
         try:
             result = _jobService.get_job_by_id(jobId)
@@ -46,7 +46,7 @@ class GetJob(Resource):
             return _handler.ConstructErrorResponse(e)
 
 @api.route(f"{ROUTE_JOBS}")
-class Jobs(Resource):
+class MultiJob(Resource):
     def get(self):
         try:
             return _handler.ConstructResponse(_jobService.get_all_jobs())
@@ -57,8 +57,6 @@ class Jobs(Resource):
     @api.expect(createJobRequestBodyFields)
     def post(self, in_file: str, out_folder: str, preset_id: UUID):
         try:
-            # request_data = request.get_json()
-            # app.logger.debug(request_data)
             result = _jobService.insert_job(in_file = in_file,
                                             out_folder = out_folder,
                                             preset_id = preset_id)
@@ -68,31 +66,44 @@ class Jobs(Resource):
             return _handler.ConstructErrorResponse(e)
 
 
-@rest_api.route(f"{ROUTE_PRESETS}", methods=['GET'])
-def GetAllPresets():
-    try:
-        result = _presetService.get_all_presets()
-        return _handler.ConstructResponse(result)
-    except Exception as e:
-        app.logger.error(f"{e=}")
-        return _handler.ConstructErrorResponse(e)
+@api.route(f"{ROUTE_PRESETS}")
+class MultiPreset(Resource):
+    def get(self):
+        try:
+            result = _presetService.get_all_presets()
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
+        
+    def post(self):
+        try:
+            request_data = request.get_json()
+            preset = Preset(request_data, True)
+            result = _presetService.insert_preset(preset)
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
     
-@rest_api.route(f"{ROUTE_PRESETS}/<id>", methods=['GET'])
-def GetPreset(id):
-    try:
-        result = _presetService.get_preset_by_id(id)
-        return _handler.ConstructResponse(result)
-    except Exception as e:
-        app.logger.error(f"{e=}")
-        return _handler.ConstructErrorResponse(e)
-
-@rest_api.route(f"{ROUTE_PRESETS}", methods=['POST'])
-def InsertPreset():
-    try:
-        request_data = request.get_json()
-        preset = Preset(request_data, True)
-        result = _presetService.insert_preset(preset)
-        return _handler.ConstructResponse(result)
-    except Exception as e:
-        app.logger.error(f"{e=}")
-        return _handler.ConstructErrorResponse(e)
+@api.route(f"{ROUTE_PRESETS}/<presetId>")
+class SinglePreset(Resource):
+    def get(self, presetId):
+        try:
+            result = _presetService.get_preset_by_id(presetId)
+            if not result:
+                return _handler.ConstructErrorResponse(Exception("Not found"), HTTPStatus.NOT_FOUND)
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
+    def put(self, presetId):
+        try:
+            request_data = request.get_json()
+            preset = Preset(request_data, False)
+            preset._id = presetId
+            result = _presetService.insert_preset(preset)
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
