@@ -1,3 +1,5 @@
+from email import message
+from http.client import HTTPException
 import json
 import traceback
 from http import HTTPStatus
@@ -22,9 +24,16 @@ class ResponseHandler:
 
     def ConstructErrorResponse(self, exception: Exception, status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR) -> Response:
         app.logger.error(f"{exception}")
+        message = str(exception)
+        if isinstance(exception, FileNotFoundError):
+            for arg in exception.args:
+                if isinstance(arg, dict):
+                    status = arg.get("status")
+                    message = arg.get("message")
+
         response = {
                 "error": type(exception).__name__,
-                "message": str(exception)
+                "message": message
         }
         
         if app.debug:

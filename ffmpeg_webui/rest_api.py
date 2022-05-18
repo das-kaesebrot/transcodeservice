@@ -32,7 +32,7 @@ class Index(Resource):
         return jsonify({
             "response": "Hello world"
         })
-        
+
 
 @api.route(f"{ROUTE_JOBS}/<jobId>")
 @api.doc(params={'jobId': 'The specified job\'s UUID'})
@@ -41,6 +41,12 @@ class SingleJob(Resource):
         try:
             result = _jobService.get_job_by_id(jobId)
             if not result:
+                raise FileNotFoundError({"message": f"Object with jobId: {jobId} was not found", "status": HTTPStatus.NOT_FOUND})
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
+    
     def put(self, jobId):
         pass
     
@@ -71,7 +77,7 @@ class MultiJob(Resource):
         except Exception as e:
             app.logger.error(f"{e=}")
             return _handler.ConstructErrorResponse(e)
-
+    
 @api.route(f"{ROUTE_PRESETS}/<presetId>")
 class SinglePreset(Resource):
     def get(self, presetId):
@@ -93,7 +99,7 @@ class SinglePreset(Resource):
         except Exception as e:
             app.logger.error(f"{e=}")
             return _handler.ConstructErrorResponse(e)
-    
+
 @api.route(f"{ROUTE_PRESETS}")
 class MultiPreset(Resource):
     def get(self):
