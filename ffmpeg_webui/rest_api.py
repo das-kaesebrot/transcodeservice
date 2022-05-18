@@ -41,7 +41,12 @@ class SingleJob(Resource):
         try:
             result = _jobService.get_job_by_id(jobId)
             if not result:
-                return _handler.ConstructErrorResponse(Exception("Not found"), HTTPStatus.NOT_FOUND)
+    def put(self, jobId):
+        pass
+    
+    def delete(self, jobId):
+        try:
+            result = _jobService.delete_job(jobId)
             return _handler.ConstructResponse(result)
         except Exception as e:
             app.logger.error(f"{e=}")
