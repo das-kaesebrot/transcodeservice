@@ -67,27 +67,6 @@ class MultiJob(Resource):
             app.logger.error(f"{e=}")
             return _handler.ConstructErrorResponse(e)
 
-
-@api.route(f"{ROUTE_PRESETS}")
-class MultiPreset(Resource):
-    def get(self):
-        try:
-            result = _presetService.get_all_presets()
-            return _handler.ConstructResponse(result)
-        except Exception as e:
-            app.logger.error(f"{e=}")
-            return _handler.ConstructErrorResponse(e)
-        
-    def post(self):
-        try:
-            request_data = request.get_json()
-            preset = Preset(request_data, True)
-            result = _presetService.insert_preset(preset)
-            return _handler.ConstructResponse(result)
-        except Exception as e:
-            app.logger.error(f"{e=}")
-            return _handler.ConstructErrorResponse(e)
-    
 @api.route(f"{ROUTE_PRESETS}/<presetId>")
 class SinglePreset(Resource):
     def get(self, presetId):
@@ -104,6 +83,26 @@ class SinglePreset(Resource):
             request_data = request.get_json()
             preset = Preset(request_data, False)
             preset._id = presetId
+            result = _presetService.insert_preset(preset)
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
+    
+@api.route(f"{ROUTE_PRESETS}")
+class MultiPreset(Resource):
+    def get(self):
+        try:
+            result = _presetService.get_all_presets()
+            return _handler.ConstructResponse(result)
+        except Exception as e:
+            app.logger.error(f"{e=}")
+            return _handler.ConstructErrorResponse(e)
+        
+    def post(self):
+        try:
+            request_data = request.get_json()
+            preset = Preset(request_data, True)
             result = _presetService.insert_preset(preset)
             return _handler.ConstructResponse(result)
         except Exception as e:
