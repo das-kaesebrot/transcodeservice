@@ -33,7 +33,9 @@ class Index(Resource):
             "response": "Hello world"
         })
         
+
 @api.route(f"{ROUTE_JOBS}/<jobId>")
+@api.doc(params={'jobId': 'The specified job\'s UUID'})
 class SingleJob(Resource):
     def get(self, jobId):
         try:
