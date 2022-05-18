@@ -1,5 +1,7 @@
 import json
 import os
+
+from attr import has
 from ffmpeg_webui import app
 from pathlib import Path
 
@@ -13,12 +15,16 @@ class Config:
         app.logger.debug("Entered config setting")
         
         _ = None
-        with open(os.path.join(path, "config.json")) as f:
-            _ = json.load(f)
+        if os.path.exists(os.path.join(path, self.FILENAME)):
+            with open(os.path.join(path, self.FILENAME)) as f:
+                _ = json.load(f)
         
         for var in self.ACCEPTED_VARS:
-            setattr(self, var, _.get(var))
+            if _:
+                setattr(self, var, _.get(var))
+            
             if os.getenv(f"{self.ENV_PREFIX}_{var.upper()}"):
                 setattr(self, var, os.getenv(f"{self.ENV_PREFIX}_{var.upper()}"))
             
-            app.logger.debug(f"Set var \"{var}\": {getattr(self, var)}")
+            if hasattr(self, var):
+                app.logger.debug(f"Set var \"{var}\": {getattr(self, var)}")
