@@ -8,6 +8,7 @@ flask = "==2.1.2"
 ffmpeg-python = "*"
 pymongo = "*"
 flask-restx = "==0.5.1"
+importlib-metadata = "*"
 
 [dev-packages]
 
