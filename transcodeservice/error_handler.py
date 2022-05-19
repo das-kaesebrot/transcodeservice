@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from ffmpeg_webui.rest_api import api, app
+from transcodeservice.rest_api import api, app
 from flask import Response, json, Blueprint
 from werkzeug.exceptions import HTTPException
 import traceback

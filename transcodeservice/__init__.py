@@ -4,8 +4,8 @@ from flask import Flask
 app = Flask(__name__)
 
 import logging
-from ffmpeg_webui import rest_api, error_handler
-from ffmpeg_webui.classes.config import Config
+from transcodeservice import rest_api, error_handler
+from transcodeservice.classes.config import Config
 from logging.config import dictConfig
 from flask.logging import default_handler
 from pymongo import results

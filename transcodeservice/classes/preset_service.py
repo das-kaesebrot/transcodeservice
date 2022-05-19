@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
-from ffmpeg_webui.classes.db import DB
-from ffmpeg_webui.classes.preset import Preset
+from transcodeservice.classes.db import DB
+from transcodeservice.classes.preset import Preset
 
 class PresetService:
 

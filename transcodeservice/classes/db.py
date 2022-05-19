@@ -1,6 +1,6 @@
 import sys
-from ffmpeg_webui.classes.config import Config
-from ffmpeg_webui import app
+from transcodeservice.classes.config import Config
+from transcodeservice import app
 from pymongo import MongoClient
 from urllib.parse import quote_plus
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
@@ -17,7 +17,7 @@ class DB:
         password = getattr(conf, "db_pass", None)
         hostname = getattr(conf, "db_hostname", "localhost")
         port = getattr(conf, "db_port", 27017)
-        database = getattr(conf, "db_database", "ffmpeg_webui_db")
+        database = getattr(conf, "db_database", "transcodeservice_db")
         tz_aware = getattr(conf, "db_tz_aware", True)
         connect = True
         uuidRepresentation = 'standard'
@@ -43,7 +43,7 @@ class DB:
                 host = host,
                 tz_aware = tz_aware,
                 connect = connect,
-                appname = "ffmpeg_webui",
+                appname = "transcodeservice",
                 uuidRepresentation = uuidRepresentation
             )
         

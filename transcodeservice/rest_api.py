@@ -1,12 +1,12 @@
 from http import HTTPStatus
 from uuid import UUID
-from ffmpeg_webui import app
+from transcodeservice import app
 from flask import Blueprint, request, jsonify
 from flask_restx import Api, Resource, fields
-from ffmpeg_webui.classes.job_service import TranscodeJobService
-from ffmpeg_webui.classes.preset import Preset
-from ffmpeg_webui.classes.preset_service import PresetService
-from ffmpeg_webui.classes.responsehandler import ResponseHandler
+from transcodeservice.classes.job_service import TranscodeJobService
+from transcodeservice.classes.preset import Preset
+from transcodeservice.classes.preset_service import PresetService
+from transcodeservice.classes.responsehandler import ResponseHandler
 from werkzeug.exceptions import HTTPException, NotFound, BadRequest
 
 # REST API routes

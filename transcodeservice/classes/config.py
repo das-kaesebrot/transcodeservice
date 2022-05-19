@@ -2,12 +2,12 @@ import json
 import os
 
 from attr import has
-from ffmpeg_webui import app
+from transcodeservice import app
 from pathlib import Path
 
 class Config:
     FILENAME = "config.json"
-    ENV_PREFIX = "FFMPEG_WEBUI"
+    ENV_PREFIX = "TRANSCODESERVICE"
     ACCEPTED_VARS = ["debug", "db_hostname", "db_pass", "db_user", "db_port", "db_debug_mode"]
     
     def __init__(self, path: str = ""):

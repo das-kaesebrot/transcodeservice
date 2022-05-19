@@ -10,10 +10,10 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "ffmpeg_webui",
+                "FLASK_APP": "transcodeservice",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1",
-                "FFMPEG_WEBUI_DEBUG": "true",
+                "TRANSCODESERVICE_DEBUG": "true",
             },
             "args": [
                 "run",

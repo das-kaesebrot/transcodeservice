@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import UUID, uuid4
-from ffmpeg_webui.classes.db import DB
-from ffmpeg_webui.classes.job import TranscodeJob
+from transcodeservice.classes.db import DB
+from transcodeservice.classes.job import TranscodeJob
 
 class TranscodeJobService:
 
