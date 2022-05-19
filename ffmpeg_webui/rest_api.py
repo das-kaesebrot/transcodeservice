@@ -12,8 +12,8 @@ from ffmpeg_webui.classes.responsehandler import ResponseHandler
 rest_api = Blueprint('rest_api', __name__)
 api = Api(rest_api, doc='/docs/', title="FFMPEG TranscodeServer REST API", default="", ordered=True)
 
-ROUTE_JOBS = "jobs"
-ROUTE_PRESETS = "presets"
+ROUTE_JOBS = "/jobs"
+ROUTE_PRESETS = "/presets"
 _jobService = TranscodeJobService()
 _presetService = PresetService()
 _handler = ResponseHandler()
