@@ -13,11 +13,6 @@ from pymongo import results
 from json import JSONEncoder
 from uuid import UUID
 
-API_VERSION = 1
-
-# register API at /api/vX prefix
-app.register_blueprint(rest_api.rest_api, url_prefix=f'/api/v{API_VERSION}')
-
 def create_app():
     
     # configure logging
