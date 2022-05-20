@@ -1,5 +1,4 @@
 from pathlib import Path
-from uuid import UUID, uuid4
 from transcodeservice.classes.db import DB
 from transcodeservice.classes.job import TranscodeJob
 
@@ -10,22 +9,11 @@ class TranscodeJobService:
     def __init__(self):
         db = DB()
         self._collection = db.database[TranscodeJobService.COLLECTION]
-    
-        
-    def _generateUUID(self):
-        while True:
-            _ = uuid4()
-            if not self._collection.find_one({
-                "_id": _
-            }):
-                return _
 
-
-    def get_job_by_id(self, job_id: UUID):
+    def get_job_by_id(self, id):
         return self._collection.find_one({
-            "_id": job_id
+            "_id": id
         })
-
 
     def get_all_jobs(self):
         return list(self._collection.find())
@@ -35,19 +23,18 @@ class TranscodeJobService:
             "_status": TranscodeJob.RUNNING
         }))
 
-    def insert_job(self, in_file: Path, out_folder: Path, preset_id: UUID):
+    def insert_job(self, in_file: Path, out_folder: Path, preset_id):
         return self._collection.insert_one(
             TranscodeJob(
-                id = self._generateUUID(),
                 in_file = in_file,
                 out_folder = out_folder,
                 preset_id = preset_id
             )
         )
     
-    def delete_job(self, job_id: UUID):
+    def delete_job(self, id):
         return self._collection.delete_one({
-            "_id": job_id
+            "_id": id
         })
     
     def update_job(self, job: TranscodeJob):
