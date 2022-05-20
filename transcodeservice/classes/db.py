@@ -26,7 +26,7 @@ class DB:
             host = "mongodb://%s:%s@%s:%i" % (
                     
                     # In order to be able to connect using a username and password,
-                    # we need to percent encode those paramter to avoid overwriting
+                    # we need to percent encode those parameters to avoid overwriting
                     # special characters ('@', '/', '+'...) reserved for the path itself
 
                     quote_plus(username), 
@@ -49,9 +49,9 @@ class DB:
         
         self.database = self._client[database]
 
-        app.logger.debug(f"Trying conn with {host}")
+        app.logger.debug(f"Trying conn with {host=}")
         self._try_connection()
-        app.logger.debug(f"Connected to {host}")
+        app.logger.debug(f"Connected to {host=}")
 
 
     def _try_connection(self):
