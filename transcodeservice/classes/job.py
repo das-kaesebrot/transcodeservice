@@ -1,4 +1,5 @@
 # Definition file for the TranscodeJob class, representing a single job object
+import enum
 import json, datetime
 import ffmpeg
 from pathlib import Path
@@ -6,18 +7,12 @@ from uuid import UUID
 
 
 class TranscodeJob:
-    CREATED = 1
-    RUNNING = 2
-    SUCCESS = 3
-    FAILED = 4
-    
     def __init__(self, in_file: Path, out_folder: Path, preset_id, id = None):
-        
         if id:
             self._id = id
         self._in_files: Path = in_file
         self._out_folder: Path = out_folder
-        self._status = TranscodeJob.CREATED
+        self._status = TranscodeJobStatus.CREATED
         self._float_complete: float = 0.0
         self._created_at = datetime.datetime.utcnow()
         self._created_at = self._modified_at
@@ -35,11 +30,11 @@ class TranscodeJob:
     def abort(self):
         pass
 
-    def get_status(self):
-        return self._status
-
-    def get_completion_status(self):
-        return self._float_complete
-
     def update_modified(self):
         self._modified_at = datetime.datetime.utcnow()
+
+class TranscodeJobStatus(enum):
+    CREATED = 1
+    RUNNING = 2
+    SUCCESS = 3
+    FAILED = 4
