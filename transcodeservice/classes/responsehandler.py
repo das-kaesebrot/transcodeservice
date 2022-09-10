@@ -5,6 +5,7 @@ import traceback
 from http import HTTPStatus
 from flask import Response
 from transcodeservice import app
+from bson import json_util
 
 class ResponseHandler:
     
@@ -13,14 +14,17 @@ class ResponseHandler:
     def __init__(self) -> None:
         pass
 
-    def ConstructResponse(self, data, status: HTTPStatus = HTTPStatus.OK) -> Response:
-        return Response(
-            response = json.dumps(data),
+    def ConstructResponse(self, data = None, status: HTTPStatus = HTTPStatus.OK) -> Response:
+        resp = Response(
             status = status,
             headers = {
                 "content-type": self.__CONTENT_TYPE__
             }
         )
+        if data:
+            resp.response = json_util.dumps(data)
+        
+        return resp
 
     def ConstructErrorResponse(self, exception: Exception, status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR) -> Response:
         app.logger.error(f"{exception}")
