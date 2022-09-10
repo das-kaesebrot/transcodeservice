@@ -2,7 +2,7 @@ from http import HTTPStatus
 from uuid import UUID
 from transcodeservice import app
 from flask import Blueprint, request, jsonify
-from flask_restx import Api, Namespace, Resource, fields
+from flask_restx import Api, Namespace, Resource, fields, reqparse
 import transcodeservice
 from transcodeservice.classes.job_service import TranscodeJobService
 from transcodeservice.classes.preset import Preset
@@ -34,6 +34,19 @@ createJobRequestBodyFields = api.model('CreateJobRequestBody', {
     'in_file': fields.String,
     'out_folder': fields.String,
     'preset_id': fields.String
+})
+
+createPresetRequestBodyFields = api.model('CreatePresetRequestBody', {
+    'v_codec': fields.String,
+    'a_codec': fields.String,
+    'format': fields.String,
+    'v_bitrate': fields.String,
+    'a_bitrate': fields.String,
+    'a_rate': fields.String,
+    'v_rate': fields.String(required=False),
+    'width': fields.Integer(required=False),
+    'height': fields.Integer(required=False),
+    'description': fields.String(required=False)
 })
 
 @ns.route('/ping', doc={
@@ -89,7 +102,7 @@ class SinglePreset(Resource):
     def get(self, presetId):
         result = _presetService.get_preset_by_id(presetId)
         if not result:
-            raise NotFound(f"Object with presetId: {presetId} was not found")
+            raise NotFound(f"Object with {presetId=} was not found")
         return _handler.ConstructResponse(result)
     
     def put(self, presetId):
@@ -98,6 +111,13 @@ class SinglePreset(Resource):
         preset._id = presetId
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result)
+    
+    @ns.response(code=int(HTTPStatus.NO_CONTENT), description="On successful deletion, this method doesn't return a body.")
+    def delete(self, presetId):
+        result = _presetService.delete_preset(presetId)
+        if result.deleted_count == 0:
+            raise NotFound(f"Object with {presetId=} was not found")
+        return _handler.ConstructResponse(status=HTTPStatus.NO_CONTENT)
 
 @ns.route(f"{ROUTE_PRESETS}")
 class MultiPreset(Resource):
@@ -105,8 +125,10 @@ class MultiPreset(Resource):
         result = _presetService.get_all_presets()
         return _handler.ConstructResponse(result)
         
+    @ns.expect(createPresetRequestBodyFields)
+    @ns.response(code=int(HTTPStatus.CREATED), description="Creation successful")
     def post(self):
         request_data = request.get_json()
         preset = Preset(request_data)
         result = _presetService.insert_preset(preset)
-        return _handler.ConstructResponse(result)
+        return _handler.ConstructResponse(result, HTTPStatus.CREATED)
