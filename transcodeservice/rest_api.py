@@ -24,6 +24,12 @@ _jobService = TranscodeJobService()
 _presetService = PresetService()
 _handler = ResponseHandler()
 
+
+# Look only in the querystring
+jobSearchParser = reqparse.RequestParser()
+jobSearchParser.add_argument('status', type=int, location='args')
+jobSearchParser.add_argument
+
 createJobRequestBodyFields = api.model('CreateJobRequestBody', {
     'in_file': fields.String,
     'out_folder': fields.String,
@@ -41,10 +47,11 @@ class Index(Resource):
 @ns.route(f"{ROUTE_JOBS}/<jobId>")
 @ns.doc(params={'jobId': 'The specified job\'s UUID'})
 class SingleJob(Resource):
+    @ns.expect(jobSearchParser)
     def get(self, jobId):
         result = _jobService.get_job_by_id(jobId)
         if not result:
-            raise NotFound(f"Object with jobId: {jobId} was not found")
+            raise NotFound(f"Object with {jobId=} was not found")
         return _handler.ConstructResponse(result)
     
     def put(self, jobId):
