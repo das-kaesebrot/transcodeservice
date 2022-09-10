@@ -1,11 +1,11 @@
 # Definition file for the TranscodeJob class, representing a single job object
 import json, datetime
+from bson import MutableMapping
 import ffmpeg
 from pathlib import Path
 from enum import Enum
 
-
-class TranscodeJob:
+class TranscodeJob(MutableMapping):
     def __init__(self, in_file: Path, out_folder: Path, preset_id, id = None):
         if id:
             self._id = id
@@ -14,7 +14,7 @@ class TranscodeJob:
         self._status = TranscodeJobStatus.CREATED
         self._float_complete: float = 0.0
         self._created_at = datetime.datetime.utcnow()
-        self._created_at = self._modified_at
+        self._modified_at = self._created_at
         self._preset_id = preset_id
 
     def __repr__(self):
