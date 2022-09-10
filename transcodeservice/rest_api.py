@@ -57,9 +57,12 @@ class SingleJob(Resource):
     def put(self, jobId):
         pass
     
+    @ns.response(code=int(HTTPStatus.NO_CONTENT), description="On successful deletion, this method doesn't return a body.")
     def delete(self, jobId):
         result = _jobService.delete_job(jobId)
-        return _handler.ConstructResponse(result)
+        if result.deleted_count == 0:
+            raise NotFound(f"Object with {jobId=} was not found")
+        return _handler.ConstructResponse(status=HTTPStatus.NO_CONTENT)
 
 @ns.route(f"{ROUTE_JOBS}")
 class MultiJob(Resource):
