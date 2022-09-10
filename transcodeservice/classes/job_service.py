@@ -21,6 +21,9 @@ class TranscodeJobService:
     def get_all_jobs(self):
         return list(self._collection.find())
     
+    def get_all_jobs_using_filter(self, filter: dict):
+        return list(self._collection.find(filter))
+    
     def get_running_jobs(self):
         return list(self._collection.find({
             "_status": TranscodeJob.RUNNING
