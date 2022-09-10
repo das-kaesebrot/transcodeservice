@@ -1,3 +1,4 @@
+from bson import ObjectId
 from transcodeservice.classes.db import DB
 from transcodeservice.classes.preset import Preset
 
@@ -17,10 +18,10 @@ class PresetService:
     
     def get_preset_by_id(self, id):
         return self._collection.find_one({
-            "_id": id
+            "_id": ObjectId(id)
         })
     
     def delete_preset(self, id):
         return self._collection.delete_one({
-            "_id": id
+            "_id": ObjectId(id)
         })

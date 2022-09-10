@@ -1,4 +1,6 @@
 from pathlib import Path
+
+from bson import ObjectId
 from transcodeservice.classes.db import DB
 from transcodeservice.classes.job import TranscodeJob
 
@@ -12,7 +14,7 @@ class TranscodeJobService:
 
     def get_job_by_id(self, id):
         return self._collection.find_one({
-            "_id": id
+            "_id": ObjectId(id)
         })
 
     def get_all_jobs(self):
@@ -34,13 +36,13 @@ class TranscodeJobService:
     
     def delete_job(self, id):
         return self._collection.delete_one({
-            "_id": id
+            "_id": ObjectId(id)
         })
     
     def update_job(self, job: TranscodeJob):
         job.update_modified()
-        return self._collection.replace_one({
-            "_id": job._id,
+        result = self._collection.replace_one({
+            "_id": ObjectId(job._id),
         }, job)
     
     def count_failed_jobs(self):
