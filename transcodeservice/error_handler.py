@@ -1,4 +1,6 @@
 from http import HTTPStatus
+
+from bson.errors import InvalidId
 from transcodeservice.rest_api import api, app
 from flask import Response, json, Blueprint
 from werkzeug.exceptions import HTTPException
@@ -26,9 +28,14 @@ def handle_exception(e):
         }
         return response, e.code
     
-    response = default_resp
-    
-    if app.debug:
+    if isinstance(e, InvalidId):
+        code = int(HTTPStatus.BAD_REQUEST)
+        return {
+            "status": code,
+            "name": type(e).__name__,
+            "message": str(e)            
+        }, code
+        
         response["traceback"] = ''.join(traceback.TracebackException.from_exception(e).stack.format())
     
     return response, response.get("status")
