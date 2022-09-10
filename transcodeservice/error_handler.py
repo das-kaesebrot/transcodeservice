@@ -36,6 +36,14 @@ def handle_exception(e):
             "message": str(e)            
         }, code
         
-        response["traceback"] = ''.join(traceback.TracebackException.from_exception(e).stack.format())
+    if app.debug:        
+        response = {
+                "status": HTTPStatus.INTERNAL_SERVER_ERROR,
+                "name": type(e).__name__,
+                "message": str(e),
+                "traceback": ''.join(traceback.TracebackException.from_exception(e).stack.format())
+        }
+    else:
+        response = default_resp
     
     return response, response.get("status")
