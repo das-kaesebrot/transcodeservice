@@ -1,3 +1,4 @@
+from werkzeug.exceptions import HTTPException, NotFound, BadRequest
 from pathlib import Path
 
 from bson import ObjectId
@@ -26,24 +27,44 @@ class TranscodeJobService:
         }))
 
     def insert_job(self, in_file: Path, out_folder: Path, preset_id):
-        return self._collection.insert_one(
+        result = self._collection.insert_one(
             TranscodeJob(
                 in_file = in_file,
                 out_folder = out_folder,
                 preset_id = preset_id
             )
         )
+        
+        return self.get_job_by_id(result.inserted_id)
     
     def delete_job(self, id):
         return self._collection.delete_one({
             "_id": ObjectId(id)
         })
     
+    def update_job_via_put(self, job_id, in_file: Path, out_folder: Path, preset_id):
+        job = TranscodeJob(
+                id=job_id,
+                in_file = in_file,
+                out_folder = out_folder,
+                preset_id = preset_id
+            )
+        return self.update_job(job)
+    
     def update_job(self, job: TranscodeJob):
         job.update_modified()
         result = self._collection.replace_one({
             "_id": ObjectId(job._id),
         }, job)
+        
+        if result.matched_count == 0:
+            raise NotFound(f"Object with jobId: {job._id} was not found")
+        
+        if result.upserted_id:
+            return self.get_job_by_id(result.upserted_id)
+        
+        return None
+            
     
     def count_failed_jobs(self):
         return self._collection.count_documents({
