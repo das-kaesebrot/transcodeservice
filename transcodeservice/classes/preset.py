@@ -18,12 +18,11 @@ class Preset(dict):
     
     REQUIRED_KEYS = ['v_codec', 'a_codec', 'format', 'v_bitrate', 'a_bitrate', 'a_rate']
     OPTIONAL_KEYS = ['v_rate', 'width', 'height', 'description']
-    ID_KEY = ['_id']
         
-    def __init__(self, data: dict, new_preset = False) -> None:
+    def __init__(self, data: dict) -> None:
         if all(key in data for key in self.REQUIRED_KEYS):
             for key in data:
-                if key not in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS) or (new_preset and key == "id"):
+                if key not in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS):
                     raise ValueError(f"Unexpected key passed: {key}")
                 setattr(self, f"{key}", data.get(key))
         else:
@@ -36,7 +35,7 @@ class Preset(dict):
     
     def Simplified(self) -> dict:
         ret_dict = {}
-        for key in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS + self.ID_KEY):
+        for key in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS):
             if hasattr(self, key):
                 ret_dict[key] = getattr(self, key)
         

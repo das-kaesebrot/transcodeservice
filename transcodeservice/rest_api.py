@@ -86,7 +86,7 @@ class SinglePreset(Resource):
     
     def put(self, presetId):
         request_data = request.get_json()
-        preset = Preset(request_data, False)
+        preset = Preset(request_data)
         preset._id = presetId
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result)
@@ -99,6 +99,6 @@ class MultiPreset(Resource):
         
     def post(self):
         request_data = request.get_json()
-        preset = Preset(request_data, True)
+        preset = Preset(request_data)
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result)
