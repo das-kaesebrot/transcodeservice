@@ -5,6 +5,7 @@ from bson import ObjectId
 from transcodeservice.classes.db import DB
 from transcodeservice.classes.job import TranscodeJob
 
+# TODO optimize DB by using preset ids as foreign keys
 class TranscodeJobService:
 
     COLLECTION = "transcodejobs"
