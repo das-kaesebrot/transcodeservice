@@ -1,9 +1,8 @@
 # Definition file for the TranscodeJob class, representing a single job object
-import enum
 import json, datetime
 import ffmpeg
 from pathlib import Path
-from uuid import UUID
+from enum import Enum
 
 
 class TranscodeJob:
@@ -33,7 +32,7 @@ class TranscodeJob:
     def update_modified(self):
         self._modified_at = datetime.datetime.utcnow()
 
-class TranscodeJobStatus(enum):
+class TranscodeJobStatus(Enum):
     CREATED = 1
     RUNNING = 2
     SUCCESS = 3
