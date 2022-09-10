@@ -11,7 +11,8 @@ class PresetService:
         self._collection = db.database[PresetService.COLLECTION]
             
     def insert_preset(self, preset: Preset):
-        return self._collection.insert_one(preset.Simplified())
+        result = self._collection.insert_one(preset.Simplified())
+        return self.get_preset_by_id(result.inserted_id)
     
     def get_all_presets(self):
         return list(self._collection.find())
