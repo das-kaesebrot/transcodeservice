@@ -60,7 +60,6 @@ class Index(Resource):
 @ns.route(f"{ROUTE_JOBS}/<jobId>")
 @ns.doc(params={'jobId': 'The specified job\'s UUID'})
 class SingleJob(Resource):
-    @ns.expect(jobSearchParser)
     def get(self, jobId):
         result = _jobService.get_job_by_id(jobId)
         if not result:
@@ -86,6 +85,8 @@ class SingleJob(Resource):
 
 @ns.route(f"{ROUTE_JOBS}")
 class MultiJob(Resource):
+    # TODO implement search via optional query parameters
+    @ns.expect(jobSearchParser)
     def get(self):
         return _handler.ConstructResponse(_jobService.get_all_jobs())
         
