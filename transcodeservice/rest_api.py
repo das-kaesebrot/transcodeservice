@@ -54,8 +54,15 @@ class SingleJob(Resource):
             raise NotFound(f"Object with {jobId=} was not found")
         return _handler.ConstructResponse(result)
     
+    @ns.expect(createJobRequestBodyFields)
+    @ns.response(code=int(HTTPStatus.OK), description="Update successful")
     def put(self, jobId):
-        pass
+        result = _jobService.update_job_via_put(
+            job_id=jobId,
+            in_file=api.payload["in_file"],
+            out_folder=api.payload["out_folder"],
+            preset_id=api.payload["preset_id"])
+        return _handler.ConstructResponse(result)
     
     @ns.response(code=int(HTTPStatus.NO_CONTENT), description="On successful deletion, this method doesn't return a body.")
     def delete(self, jobId):
@@ -70,11 +77,12 @@ class MultiJob(Resource):
         return _handler.ConstructResponse(_jobService.get_all_jobs())
         
     @ns.expect(createJobRequestBodyFields)
-    def post(self, in_file: str, out_folder: str, preset_id: UUID):
-        result = _jobService.insert_job(in_file = in_file,
-                                        out_folder = out_folder,
-                                        preset_id = preset_id)
-        return _handler.ConstructResponse("well")
+    @ns.response(code=int(HTTPStatus.CREATED), description="Creation successful")
+    def post(self):
+        result = _jobService.insert_job(in_file = api.payload["in_file"],
+                                        out_folder = api.payload["out_folder"],
+                                        preset_id = api.payload["preset_id"])
+        return _handler.ConstructResponse(result, HTTPStatus.CREATED)
 
 @ns.route(f"{ROUTE_PRESETS}/<presetId>")
 class SinglePreset(Resource):
