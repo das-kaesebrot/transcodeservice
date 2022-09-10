@@ -3,6 +3,8 @@
 # TODO map options of ffmpeg-python to preset attributes
 # https://kkroening.github.io/ffmpeg-python/
 
+import datetime
+
 class Preset(dict):
     
     _id = None
@@ -25,6 +27,10 @@ class Preset(dict):
                 if key not in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS):
                     raise ValueError(f"Unexpected key passed: {key}")
                 setattr(self, f"{key}", data.get(key))
+        
+            self._created_at = datetime.datetime.utcnow()
+            self._modified_at = self._created_at
+            
         else:
             raise ValueError(f"At least one key is missing",
                             {"required": self.REQUIRED_KEYS},
@@ -32,6 +38,13 @@ class Preset(dict):
         
     def __getattr__(self, attr):
         return self.get(attr)
+    
+    
+    def __setattr__(self, attr, value):
+        self[attr] = value
+    
+    def update_modified(self):
+        self._modified_at = datetime.datetime.utcnow()
     
     def Simplified(self) -> dict:
         ret_dict = {}
