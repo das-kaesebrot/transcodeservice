@@ -136,8 +136,8 @@ class SinglePreset(Resource):
     def put(self, presetId):
         request_data = request.get_json()
         preset = PresetHelper.from_dict(request_data)
-        preset._id = presetId
-        result = _presetService.insert_preset(preset)
+        preset.id = presetId
+        result = _presetService.update_preset(preset)
         return _handler.ConstructResponse(result)
     
     @ns.response(code=int(HTTPStatus.NO_CONTENT), description="On successful deletion, this method doesn't return a body.")

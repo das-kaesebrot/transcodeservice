@@ -42,6 +42,14 @@ class Preset(Base):
     def to_dict(self) -> dict:
        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
    
+    def to_dict_for_update(self) -> dict:
+        update_dict = self.to_dict()
+        update_dict.pop("modified")
+        update_dict.pop("created")
+        update_dict.pop("id")
+        
+        return update_dict
+    
 class PresetHelper():
     
     @staticmethod
