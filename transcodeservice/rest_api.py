@@ -3,6 +3,7 @@ from uuid import UUID
 from transcodeservice import app
 from flask import Blueprint, request, jsonify
 from flask_restx import Api, Namespace, Resource, fields, reqparse
+from transcodeservice.classes.ffmpeg_info import FfmpegInfo
 from transcodeservice.models.job import TranscodeJobStatus
 from transcodeservice.models.preset import PresetHelper
 from transcodeservice.classes.db import DB
@@ -22,11 +23,13 @@ api.add_namespace(ns)
 
 ROUTE_JOBS = "/jobs"
 ROUTE_PRESETS = "/presets"
+ROUTE_FFMPEG_INFO = "/capabilities"
 
 db = DB()
 _jobService = TranscodeJobService(db.get_session())
 _presetService = PresetService(db.get_session())
 _handler = ResponseHandler()
+_info = FfmpegInfo()
 
 
 # Look only in the querystring
@@ -161,3 +164,11 @@ class MultiPreset(Resource):
         preset = PresetHelper.from_dict(request_data)
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result, HTTPStatus.CREATED)
+    
+@ns.route(f"{ROUTE_FFMPEG_INFO}")
+class FfmpegInfoRoute(Resource):
+    @ns.response(code=int(HTTPStatus.OK), description="OK")
+    def get(self):
+        result = _info.get_cached_info()
+        return _handler.ConstructResponse(result)
+    
