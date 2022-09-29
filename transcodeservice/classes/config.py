@@ -28,3 +28,9 @@ class Config:
             
             if hasattr(self, var):
                 app.logger.debug(f"Set var \"{var}\": {getattr(self, var)}")
+                
+        if not self.db_string:
+            self.db_string = "sqlite:///:memory:"
+            
+        if not self.db_debug_mode:
+            self.db_debug_mode = False
