@@ -5,6 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from transcodeservice.models.job import TranscodeJob, TranscodeJobStatus
+from transcodeservice.models.preset import Preset
 
 # TODO optimize DB by using preset ids as foreign keys
 class TranscodeJobService:
@@ -27,16 +28,22 @@ class TranscodeJobService:
             filter(status=TranscodeJobStatus.RUNNING).\
             all()
 
-    def insert_job(self, in_file: Path, out_folder: Path, preset_id):
-        self._session.add(TranscodeJob(
+    def insert_job(self, in_file: Path, out_folder: Path, preset_id) -> TranscodeJob:
+        
+        if not self._session.get(Preset, preset_id):
+            raise BadRequest(f"Unable to find a preset by {preset_id=}")
+        
+        job = TranscodeJob(
                 in_file = in_file,
                 out_folder = out_folder,
                 preset_id = preset_id
-            ))
+            )
+        
+        self._session.add(job)
         
         self._session.commit()
-                      
-        return self.get_job_by_id()
+        self._session.refresh(job)
+        return job        
     
     def delete_job(self, id):
         self._session.delete(self.get_job_by_id(id))
@@ -51,9 +58,13 @@ class TranscodeJobService:
             )
         return self.update_job(job)
     
-    def update_job(self, job: TranscodeJob):
+    def update_job(self, job: TranscodeJob) -> TranscodeJob:
         self._session.query(TranscodeJob).\
-            filter(id=job.id).update(job)
+            filter_by(id=job.id).update(job.to_dict_for_update())
+        
+        self._session.commit()
+        self._session.refresh(job)
+        return job        
     
     def count_failed_jobs(self):
         return self._session.\
