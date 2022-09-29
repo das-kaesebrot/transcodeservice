@@ -35,7 +35,9 @@ class ResponseHandler:
                 
             elif isinstance(data, TranscodeJob) or isinstance(data, Preset):
                 resp.response = json.dumps(data.to_dict())
-        
+
+            elif isinstance(data, dict):
+                resp.data = json.dumps(data)
         
         return resp
 
