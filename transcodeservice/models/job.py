@@ -28,6 +28,12 @@ class TranscodeJob(Base):
     preset_id = Column(UUIDType, ForeignKey('preset.id'))
     preset = relationship("Preset", back_populates="jobs")
     
+    def __init__(self, in_file, out_folder, preset_id) -> None:
+        self.in_file = in_file
+        self.out_folder = out_folder
+        self.status = TranscodeJobStatus.CREATED
+        self.preset_id = preset_id
+    
     def __repr__(self):
         return f"TranscodeJob(id={self.id!r}, in_file={self.in_file!r}, out_folder={self.out_folder!r}, status={self.status!r}, created={self.created!r}, modified={self.modified!r}, preset_id={self.preset_id!r})"
 
