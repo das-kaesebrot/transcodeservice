@@ -84,7 +84,7 @@ class SingleJob(Resource):
             raise NotFound(f"Object with {jobId=} was not found")
         return _handler.ConstructResponse(result)
     
-    @ns.expect(createJobRequestBodyFields)
+    @ns.expect(updateJobRequestBodyFields)
     @ns.response(code=int(HTTPStatus.OK), description="Update successful")
     def put(self, jobId):
         result = _jobService.update_job_via_put(
