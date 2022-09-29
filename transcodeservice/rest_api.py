@@ -39,17 +39,31 @@ createJobRequestBodyFields = api.model('CreateJobRequestBody', {
     'preset_id': fields.String
 })
 
+updateJobRequestBodyFields = api.model('UpdateJobRequestBody', {
+    'in_file': fields.String(required=False),
+    'out_folder': fields.String(required=False),
+    'preset_id': fields.String(required=False),
+    'status': fields.String(enum=[x.name.lower() for x in TranscodeJobStatus], required=False)
+})
+
 createPresetRequestBodyFields = api.model('CreatePresetRequestBody', {
-    'v_codec': fields.String,
-    'a_codec': fields.String,
+    'description': fields.String(required=False),
+    
+    'vcodec': fields.String,
+    'acodec': fields.String,
+    'vbitrate': fields.Integer,
+    'abitrate': fields.Integer,
     'format': fields.String,
-    'v_bitrate': fields.String,
-    'a_bitrate': fields.String,
-    'a_rate': fields.String,
-    'v_rate': fields.String(required=False),
+    
     'width': fields.Integer(required=False),
     'height': fields.Integer(required=False),
-    'description': fields.String(required=False)
+    'framerate': fields.Float(required=False),
+    'audiorate': fields.Integer(required=False),
+    'crf': fields.Integer(required=False),
+    
+    'videofilter': fields.String(required=False),
+    'audiofilter': fields.String(required=False),
+    'pix_fmt': fields.String(required=False)
 })
 
 @ns.route('/ping', doc={
