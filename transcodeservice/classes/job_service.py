@@ -25,7 +25,7 @@ class TranscodeJobService:
     def get_running_jobs(self):
         return self._session.\
             query(TranscodeJob).\
-            filter(status=TranscodeJobStatus.RUNNING).\
+            filter_by(status=TranscodeJobStatus.RUNNING).\
             all()
 
     def insert_job(self, in_file: Path, out_folder: Path, preset_id) -> TranscodeJob:
@@ -81,9 +81,9 @@ class TranscodeJobService:
             query(func.count(TranscodeJob.id))
 
     def clear_job_history(self):
-        jobs_to_be_deleted = self._session.\
+        self._session.\
             query(TranscodeJob).\
-            filter((TranscodeJob.status == TranscodeJobStatus.SUCCESS) | (TranscodeJob.status == TranscodeJobStatus.FAILED)).\
+            filter_by((TranscodeJob.status == TranscodeJobStatus.SUCCESS) | (TranscodeJob.status == TranscodeJobStatus.FAILED)).\
             delete()
             
         self._session.commit()
