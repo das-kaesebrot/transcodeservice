@@ -132,9 +132,10 @@ class SinglePreset(Resource):
             raise NotFound(f"Object with {presetId=} was not found")
         return _handler.ConstructResponse(result)
     
+    @ns.expect(createPresetRequestBodyFields)
     def put(self, presetId):
         request_data = request.get_json()
-        preset = Preset(request_data)
+        preset = PresetHelper.from_dict(request_data)
         preset._id = presetId
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result)
@@ -156,6 +157,6 @@ class MultiPreset(Resource):
     @ns.response(code=int(HTTPStatus.CREATED), description="Creation successful")
     def post(self):
         request_data = request.get_json()
-        preset = Preset(request_data)
+        preset = PresetHelper.from_dict(request_data)
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result, HTTPStatus.CREATED)

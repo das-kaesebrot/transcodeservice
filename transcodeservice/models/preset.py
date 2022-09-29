@@ -42,3 +42,13 @@ class Preset(Base):
     def to_dict(self) -> dict:
        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
    
+class PresetHelper():
+    
+    @staticmethod
+    def from_dict(data: dict) -> Preset:
+        job = Preset()
+       
+        for key, value in data.items():
+            setattr(job, key, value)
+
+        return job
