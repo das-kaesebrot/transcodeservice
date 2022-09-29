@@ -34,5 +34,5 @@ class DB:
         
         app.logger.debug(f"Connected to {conn_string=}")
         
-    def get_new_session(self) -> Session:
+    def get_session(self) -> Session:
         return Session(self.engine, future=True)

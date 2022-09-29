@@ -23,8 +23,8 @@ ROUTE_JOBS = "/jobs"
 ROUTE_PRESETS = "/presets"
 
 db = DB()
-_jobService = TranscodeJobService(db.get_new_session())
-_presetService = PresetService(db.get_new_session())
+_jobService = TranscodeJobService(db.get_session())
+_presetService = PresetService(db.get_session())
 _handler = ResponseHandler()
 
 
