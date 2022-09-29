@@ -5,6 +5,8 @@ import traceback
 from http import HTTPStatus
 from flask import Response
 from transcodeservice import app
+from transcodeservice.models.job import TranscodeJob
+from transcodeservice.models.preset import Preset
 
 class ResponseHandler:
     
@@ -20,8 +22,20 @@ class ResponseHandler:
                 "content-type": self.__CONTENT_TYPE__
             }
         )
+        
         if data:
-            resp.response = data
+            if isinstance(data, list):
+                temp_list = []
+                
+                for item in data:
+                    if isinstance(item, TranscodeJob) or isinstance(item, Preset):
+                        temp_list.append(item.to_dict())
+                        
+                resp.response = json.dumps(temp_list)
+                
+            elif isinstance(data, TranscodeJob) or isinstance(data, Preset):
+                resp.response = json.dumps(data.to_dict())
+        
         
         return resp
 
