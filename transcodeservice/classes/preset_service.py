@@ -1,14 +1,11 @@
-from bson import ObjectId
-from transcodeservice.classes.db import DB
-from transcodeservice.classes.preset import Preset
+from sqlalchemy.orm import Session
+from transcodeservice.models.preset import Preset
 
-class PresetService:
-
-    COLLECTION = "presets"
-
-    def __init__(self):
-        db = DB()
-        self._collection = db.database[PresetService.COLLECTION]
+class PresetService:    
+    
+    
+    def __init__(self, session: Session) -> None:
+        self._session = session
             
     def insert_preset(self, preset: Preset):
         result = self._collection.insert_one(preset.Simplified())
@@ -19,10 +16,10 @@ class PresetService:
     
     def get_preset_by_id(self, id):
         return self._collection.find_one({
-            "_id": ObjectId(id)
+            "_id": id
         })
     
     def delete_preset(self, id):
         return self._collection.delete_one({
-            "_id": ObjectId(id)
+            "_id": id
         })

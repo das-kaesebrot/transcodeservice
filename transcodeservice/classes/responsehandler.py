@@ -5,7 +5,6 @@ import traceback
 from http import HTTPStatus
 from flask import Response
 from transcodeservice import app
-from bson import json_util
 
 class ResponseHandler:
     
@@ -22,7 +21,7 @@ class ResponseHandler:
             }
         )
         if data:
-            resp.response = json_util.dumps(data)
+            resp.response = data
         
         return resp
 

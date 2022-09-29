@@ -1,6 +1,5 @@
 from http import HTTPStatus
 
-from bson.errors import InvalidId
 from transcodeservice.rest_api import api, app
 from flask import Response, json, Blueprint
 from werkzeug.exceptions import HTTPException
@@ -27,14 +26,6 @@ def handle_exception(e):
             "message": e.description,
         }
         return response, e.code
-    
-    if isinstance(e, InvalidId):
-        code = int(HTTPStatus.BAD_REQUEST)
-        return {
-            "status": code,
-            "name": type(e).__name__,
-            "message": str(e)            
-        }, code
         
     if app.debug:        
         response = {
