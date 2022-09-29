@@ -3,12 +3,13 @@ from uuid import UUID
 from transcodeservice import app
 from flask import Blueprint, request, jsonify
 from flask_restx import Api, Namespace, Resource, fields, reqparse
-import transcodeservice
 from transcodeservice.classes.job_service import TranscodeJobService
-from transcodeservice.classes.preset import Preset
+from transcodeservice.classes.db import DB
+from transcodeservice.models.preset import Preset
 from transcodeservice.classes.preset_service import PresetService
 from transcodeservice.classes.responsehandler import ResponseHandler
 from werkzeug.exceptions import HTTPException, NotFound, BadRequest
+from sqlalchemy.orm import Session
 
 
 API_VERSION = 1
@@ -20,8 +21,10 @@ api.add_namespace(ns)
 
 ROUTE_JOBS = "/jobs"
 ROUTE_PRESETS = "/presets"
-_jobService = TranscodeJobService()
-_presetService = PresetService()
+
+db = DB()
+_jobService = TranscodeJobService(db.get_new_session())
+_presetService = PresetService(db.get_new_session())
 _handler = ResponseHandler()
 
 
