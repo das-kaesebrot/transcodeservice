@@ -69,7 +69,7 @@ createPresetRequestBodyFields = api.model('CreatePresetRequestBody', {
 @ns.route('/ping', doc={
         "description": "Ping route"
     },)
-class Index(Resource):
+class Ping(Resource):
     def get(self):
         return { "data": "pong" }, 200
 
