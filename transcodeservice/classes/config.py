@@ -8,7 +8,7 @@ from pathlib import Path
 class Config:
     FILENAME = "config.json"
     ENV_PREFIX = "TRANSCODESERVICE"
-    ACCEPTED_VARS = ["debug", "db_hostname", "db_pass", "db_user", "db_port", "db_debug_mode"]
+    ACCEPTED_VARS = ["debug", "db_string", "db_debug_mode", "db_hostname", "db_pass", "db_user", "db_port"]
     
     def __init__(self, path: str = ""):
         
