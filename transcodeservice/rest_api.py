@@ -30,8 +30,9 @@ _handler = ResponseHandler()
 
 # Look only in the querystring
 jobSearchParser = reqparse.RequestParser()
-jobSearchParser.add_argument('status', type=int, location='args')
-jobSearchParser.add_argument
+jobSearchParser.add_argument('status_i', type=int, location='args')
+jobSearchParser.add_argument('status_s', type=str, location='args')
+jobSearchParser.add_argument('preset_id', type=UUID, location='args')
 
 createJobRequestBodyFields = api.model('CreateJobRequestBody', {
     'in_file': fields.String,
@@ -102,10 +103,18 @@ class SingleJob(Resource):
 
 @ns.route(f"{ROUTE_JOBS}")
 class MultiJob(Resource):
-    # TODO implement search via optional query parameters
     @ns.expect(jobSearchParser)
     def get(self):
-        return _handler.ConstructResponse(_jobService.get_all_jobs())
+        args = jobSearchParser.parse_args()
+        status = args['status_i']
+        if status:
+            status = TranscodeJobStatus(status)
+        else:
+            status = args['status_s']
+            if status:
+                status = TranscodeJobStatus[status.upper()]
+                
+        return _handler.ConstructResponse(_jobService.get_all_jobs_with_filter(status, presetId=args['preset_id']))
         
     @ns.expect(createJobRequestBodyFields)
     @ns.response(code=int(HTTPStatus.CREATED), description="Creation successful")

@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from transcodeservice.models.job import TranscodeJob, TranscodeJobStatus
 from transcodeservice.models.preset import Preset
 
-# TODO optimize DB by using preset ids as foreign keys
 class TranscodeJobService:
     
     def __init__(self, session: Session) -> None:
@@ -21,7 +20,17 @@ class TranscodeJobService:
         return self._session.\
             query(TranscodeJob).\
             all()
-    
+
+    def get_all_jobs_with_filter(self, status: TranscodeJobStatus = None, presetId: Preset.id = None):
+        q = self._session.query(TranscodeJob)
+        if status:
+            q = q.filter_by(status=status)
+        
+        if presetId:
+            q = q.filter_by(preset_id=presetId)
+            
+        return q.all()
+
     def get_running_jobs(self):
         return self._session.\
             query(TranscodeJob).\
