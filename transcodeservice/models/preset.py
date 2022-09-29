@@ -39,3 +39,6 @@ class Preset(Base):
     def __repr__(self):
         return f"Preset(id={self.id!r}, description={self.description!r}, created={self.created!r}, modified={self.modified})"
     
+    def to_dict(self) -> dict:
+       return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+   
