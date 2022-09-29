@@ -1,55 +1,41 @@
 # Definition file for the Preset class, representing a single preset object
-# 
-# TODO map options of ffmpeg-python to preset attributes
-# https://kkroening.github.io/ffmpeg-python/
 
-import datetime
+import uuid
+from .base import Base
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from sqlalchemy import Column, BigInteger, Integer, String, DateTime, Float
+from sqlalchemy_utils import UUIDType
 
-class Preset(dict):
+class Preset(Base):
     
-    _id = None
-    _description = "A default preset placeholder description"
-    _vcodec = None
-    _acodec = None
-    _container = None
-    _width = None
-    _height = None
-    _vbitrate = None
-    _abitrate = None
-    _fps = None
+    __tablename__ = 'preset'
     
-    REQUIRED_KEYS = ['v_codec', 'a_codec', 'format', 'v_bitrate', 'a_bitrate', 'a_rate']
-    OPTIONAL_KEYS = ['v_rate', 'width', 'height', 'description']
+    id = Column(UUIDType, primary_key=True, default=uuid.uuid4)
+    description = Column(String)
+    
+    vcodec = Column(String)
+    acodec = Column(String)
+    vbitrate = Column(BigInteger)
+    abitrate = Column(BigInteger)
+    format = Column(String(32))
+    
+    width = Column(Integer)
+    height = Column(Integer)
+    framerate = Column(Float)
+    audiorate = Column(BigInteger)
+    crf = Column(Integer)
+    
+    videofilter = Column(String)
+    audiofilter = Column(String)
+    
+    pix_fmt = Column(String)
         
-    def __init__(self, data: dict) -> None:
-        if all(key in data for key in self.REQUIRED_KEYS):
-            for key in data:
-                if key not in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS):
-                    raise ValueError(f"Unexpected key passed: {key}")
-                setattr(self, f"{key}", data.get(key))
-        
-            self._created_at = datetime.datetime.utcnow()
-            self._modified_at = self._created_at
-            
-        else:
-            raise ValueError(f"At least one key is missing",
-                            {"required": self.REQUIRED_KEYS},
-                            {"optional": self.OPTIONAL_KEYS})
-        
-    def __getattr__(self, attr):
-        return self.get(attr)
+    created = Column(DateTime, server_default=func.now())
+    modified = Column(DateTime, server_default=func.now(), onupdate=func.current_timestamp())
     
+    jobs = relationship("TranscodeJob", back_populates="preset")
     
-    def __setattr__(self, attr, value):
-        self[attr] = value
+    def __repr__(self):
+        return f"Preset(id={self.id!r}, description={self.description!r}, created={self.created!r}, modified={self.modified})"
     
-    def update_modified(self):
-        self._modified_at = datetime.datetime.utcnow()
-    
-    def Simplified(self) -> dict:
-        ret_dict = {}
-        for key in (self.REQUIRED_KEYS + self.OPTIONAL_KEYS):
-            if hasattr(self, key):
-                ret_dict[key] = getattr(self, key)
-        
-        return ret_dict
