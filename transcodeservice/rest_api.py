@@ -3,9 +3,10 @@ from uuid import UUID
 from transcodeservice import app
 from flask import Blueprint, request, jsonify
 from flask_restx import Api, Namespace, Resource, fields, reqparse
-from transcodeservice.classes.job_service import TranscodeJobService
+from transcodeservice.models.job import TranscodeJobStatus
+from transcodeservice.models.preset import PresetHelper
 from transcodeservice.classes.db import DB
-from transcodeservice.models.preset import Preset
+from transcodeservice.classes.job_service import TranscodeJobService
 from transcodeservice.classes.preset_service import PresetService
 from transcodeservice.classes.responsehandler import ResponseHandler
 from werkzeug.exceptions import HTTPException, NotFound, BadRequest
