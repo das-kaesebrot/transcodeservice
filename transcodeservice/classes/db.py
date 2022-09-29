@@ -1,62 +1,38 @@
 import sys
 from transcodeservice.classes.config import Config
+from transcodeservice.models.base import Base
 from transcodeservice import app
-from pymongo import MongoClient
-from urllib.parse import quote_plus
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from sqlalchemy.engine import Engine
 
 # This is the database initilization class.
 
 class DB:
     
+    engine: Engine
+    
     def __init__(self):
                 
         conf = Config()
-                        
-        username = getattr(conf, "db_user", None)
-        password = getattr(conf, "db_pass", None)
-        hostname = getattr(conf, "db_hostname", "localhost")
-        port = getattr(conf, "db_port", 27017)
-        database = getattr(conf, "db_database", "transcodeservice_db")
-        tz_aware = getattr(conf, "db_tz_aware", True)
-        connect = True
-        uuidRepresentation = 'standard'
-        
-        if username:
-            host = "mongodb://%s:%s@%s:%i" % (
-                    
-                    # In order to be able to connect using a username and password,
-                    # we need to percent encode those parameters to avoid overwriting
-                    # special characters ('@', '/', '+'...) reserved for the path itself
 
-                    quote_plus(username), 
-                    quote_plus(password),
-                    hostname,
-                    port
-                )
-        else: host = "mongodb://%s:%i" % (                    
-                    hostname,
-                    port
-                )
+        conn_string = getattr(conf, "db_string")
+        echo = getattr(conf, "db_debug_mode")
         
-        self._client = MongoClient(
-                host = host,
-                tz_aware = tz_aware,
-                connect = connect,
-                appname = "transcodeservice",
-                uuidRepresentation = uuidRepresentation
+        app.logger.debug(f"Trying conn with {conn_string=}")
+        
+        self.engine = create_engine(
+                url = conn_string,
+                echo = echo,
+                future = True,
+                pool_pre_ping = True
             )
         
-        self.database = self._client[database]
-
-        app.logger.debug(f"Trying conn with {host=}")
-        self._try_connection()
-        app.logger.debug(f"Connected to {host=}")
-
-
-    def _try_connection(self):
-        try:
-            self._client.admin.command('ping')
-        except ConnectionFailure or ServerSelectionTimeoutError:
-            app.logger.error("MongoDB server at %s not available" % self._client.server_info())
-            sys.exit(1)
+        self.engine.connect()
+        
+        Base.metadata.create_all(bind=self.engine)
+        
+        app.logger.debug(f"Connected to {conn_string=}")
+        
+    def get_new_session(self) -> Session:
+        return Session(self.engine, future=True)
