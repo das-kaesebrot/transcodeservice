@@ -7,13 +7,17 @@ from sqlalchemy.sql import func
 from sqlalchemy import Table, Column, Integer, String, Enum, DateTime, ForeignKey
 from sqlalchemy_utils import UUIDType
 
-class TranscodeJobStatus(enum.Enum):
-    CREATED = 1
-    STARTED = 2 # used to hand over job to event watcher
-    RUNNING = 3
-    ABORTED = 4
-    SUCCESS = 5
-    FAILED = 6
+class TranscodeJobStatus(enum.IntEnum):
+    CREATED:    int = 0
+    STARTED:    int = 1 # used to hand over job to event watcher
+    RUNNING:    int = 2
+    ABORTED:    int = 3
+    SUCCESS:    int = 4
+    FAILED:     int = 5
+    
+    def __str__(self):
+        return self.name
+    
 
 class TranscodeJob(Base):
     
