@@ -4,7 +4,7 @@ import uuid
 from .base import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy import Table, Column, Integer, String, Enum, TIMESTAMP, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, Enum, DateTime, ForeignKey
 from sqlalchemy_utils import UUIDType
 
 class TranscodeJobStatus(enum.Enum):
@@ -23,8 +23,8 @@ class TranscodeJob(Base):
     in_file = Column(String, nullable=False)
     out_folder = Column(String, nullable=False)
     status = Column(Enum(TranscodeJobStatus))
-    created = Column(TIMESTAMP, server_default=func.now())
-    modified = Column(TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp())
+    created = Column(DateTime, server_default=func.now())
+    modified = Column(DateTime, server_default=func.now(), onupdate=func.current_timestamp())
     preset_id = Column(UUIDType, ForeignKey('preset.id'))
     preset = relationship("Preset", back_populates="jobs")
     
