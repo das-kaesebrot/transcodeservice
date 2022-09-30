@@ -15,15 +15,16 @@ from sqlalchemy.orm import Session
 
 
 API_VERSION = 1
-
-# REST API routes
-api = Api(app, prefix=f'/api/v{API_VERSION}', doc=f'/docs/', title="FFMPEG TranscodeServer REST API", ordered=True, version=API_VERSION)
-ns = Namespace("TranscodeService", path="/transcodeservice")
-api.add_namespace(ns)
-
+ROUTE_SWAGGER = "/docs/"
 ROUTE_JOBS = "/jobs"
 ROUTE_PRESETS = "/presets"
 ROUTE_FFMPEG_INFO = "/capabilities"
+
+# REST API routes
+api = Api(app, prefix=f'/api/v{API_VERSION}', doc=f'{ROUTE_SWAGGER}', title="FFMPEG TranscodeServer REST API", ordered=True, version=API_VERSION)
+ns = Namespace("TranscodeService", path="/transcodeservice")
+api.add_namespace(ns)
+
 
 db = DB()
 _jobService = TranscodeJobService(db.get_session())
