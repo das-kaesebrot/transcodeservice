@@ -2,6 +2,7 @@ import json
 import os
 
 from transcodeservice import app
+from urllib.parse import quote_plus
 
 from transcodeservice.util.str2bool import str2bool
 
@@ -58,8 +59,38 @@ class Config:
             expected_type = var_tuple[1]
             app.logger.debug(f"Config var \"{var}\" ({expected_type.__name__}): {getattr(self, var)}")
         
-        if not self.db_string:
-            self.db_string = "sqlite:///:memory:"
+        self.construct_db_string()
             
         if not self.db_debug_mode:
             self.db_debug_mode = False
+            
+    def construct_db_string(self) -> None:        
+        if not self.db_string:
+            if self.db_user:
+                self.db_string = "%s://%s:%s@%s:%i/%s" % (                    
+                    # In order to be able to connect using a username and password,
+                    # we need to percent encode those parameters to avoid overwriting
+                    # special characters ('@', '/', '+'...) reserved for the path itself
+
+                    self.db_dialect,
+                    quote_plus(self.db_user), 
+                    quote_plus(self.db_pass),
+                    self.db_host,
+                    self.db_port,
+                    self.db_database
+                )
+            elif self.db_host:
+                self.db_string = "%s://%s:%i/%s" % (   
+                    self.db_dialect,
+                    self.db_host,
+                    self.db_port,
+                    self.db_database
+                )
+            else:
+                self.db_string = "%s:///%s" % (
+                    self.db_dialect,
+                    self.db_database
+                )
+        
+        app.logger.debug(f"Constructed database connection string as '{self.db_string}'")
+        
