@@ -156,12 +156,10 @@ class SinglePreset(Resource):
             raise NotFound(f"Object with {presetId=} was not found")
         return _handler.ConstructResponse(result)
     
-    @ns.expect(createPresetRequestBodyFields)
+    @ns.expect(updatePresetRequestBodyFields)
     def put(self, presetId):
         request_data = request.get_json()
-        preset = PresetHelper.from_dict(request_data)
-        preset.id = presetId
-        result = _presetService.update_preset(preset)
+        result = _presetService.update_preset(request_data, presetId)
         return _handler.ConstructResponse(result)
     
     @ns.response(code=int(HTTPStatus.NO_CONTENT), description="On successful deletion, this method doesn't return a body.")

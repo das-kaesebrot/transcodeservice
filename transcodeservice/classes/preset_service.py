@@ -14,13 +14,12 @@ class PresetService:
         
         return preset
         
-    def update_preset(self, preset: Preset):        
+    def update_preset(self, update_dict: dict, preset_id: Preset.id):        
         self._session.query(Preset).\
-            filter_by(id=preset.id).update(preset.to_dict_for_update())
+            filter_by(id=preset_id).update(update_dict)
         
         self._session.commit()
-        self._session.refresh(preset)
-        return preset
+        return self._session.get(Preset, preset_id)
     
     def get_all_presets(self):
         return list(self._session.query(Preset).all())
