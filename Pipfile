@@ -4,11 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+Werkzeug = "<= 2.1.2"
 flask = "==2.1.2"
+flask-restx = ">=0.5.1"
 ffmpeg-python = "*"
-pymongo = "*"
-flask-restx = "==0.5.1"
 importlib-metadata = "*"
+sqlalchemy = "==1.4.*"
+sqlalchemy-utils = "*"
+psycopg2-binary = "*"
+mysqlclient = "*"
 
 [dev-packages]
 

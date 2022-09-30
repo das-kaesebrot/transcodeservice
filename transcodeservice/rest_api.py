@@ -3,32 +3,41 @@ from uuid import UUID
 from transcodeservice import app
 from flask import Blueprint, request, jsonify
 from flask_restx import Api, Namespace, Resource, fields, reqparse
-import transcodeservice
+from transcodeservice.classes.ffmpeg_info import FfmpegInfo
+from transcodeservice.models.job import TranscodeJobStatus
+from transcodeservice.models.preset import PresetHelper
+from transcodeservice.classes.db import DB
 from transcodeservice.classes.job_service import TranscodeJobService
-from transcodeservice.classes.preset import Preset
 from transcodeservice.classes.preset_service import PresetService
 from transcodeservice.classes.responsehandler import ResponseHandler
 from werkzeug.exceptions import HTTPException, NotFound, BadRequest
+from sqlalchemy.orm import Session
 
 
 API_VERSION = 1
+ROUTE_SWAGGER = "/docs/"
+ROUTE_JOBS = "/jobs"
+ROUTE_PRESETS = "/presets"
+ROUTE_FFMPEG_INFO = "/capabilities"
 
 # REST API routes
-api = Api(app, prefix=f'/api/v{API_VERSION}', doc=f'/docs/', title="FFMPEG TranscodeServer REST API", ordered=True, version=API_VERSION)
+api = Api(app, prefix=f'/api/v{API_VERSION}', doc=f'{ROUTE_SWAGGER}', title="FFMPEG TranscodeServer REST API", ordered=True, version=API_VERSION)
 ns = Namespace("TranscodeService", path="/transcodeservice")
 api.add_namespace(ns)
 
-ROUTE_JOBS = "/jobs"
-ROUTE_PRESETS = "/presets"
-_jobService = TranscodeJobService()
-_presetService = PresetService()
+
+db = DB()
+_jobService = TranscodeJobService(db.get_session())
+_presetService = PresetService(db.get_session())
 _handler = ResponseHandler()
+_info = FfmpegInfo()
 
 
 # Look only in the querystring
 jobSearchParser = reqparse.RequestParser()
-jobSearchParser.add_argument('status', type=int, location='args')
-jobSearchParser.add_argument
+jobSearchParser.add_argument('status_i', type=int, location='args')
+jobSearchParser.add_argument('status_s', type=str, location='args')
+jobSearchParser.add_argument('preset_id', type=UUID, location='args')
 
 createJobRequestBodyFields = api.model('CreateJobRequestBody', {
     'in_file': fields.String,
@@ -36,26 +45,60 @@ createJobRequestBodyFields = api.model('CreateJobRequestBody', {
     'preset_id': fields.String
 })
 
+updateJobRequestBodyFields = api.model('UpdateJobRequestBody', {
+    'in_file': fields.String(required=False),
+    'out_folder': fields.String(required=False),
+    'preset_id': fields.String(required=False),
+    'status': fields.String(enum=[x.name.lower() for x in TranscodeJobStatus], required=False)
+})
+
 createPresetRequestBodyFields = api.model('CreatePresetRequestBody', {
-    'v_codec': fields.String,
-    'a_codec': fields.String,
-    'format': fields.String,
-    'v_bitrate': fields.String,
-    'a_bitrate': fields.String,
-    'a_rate': fields.String,
-    'v_rate': fields.String(required=False),
+    'description': fields.String(required=False),
+    
+    'vcodec': fields.String(enum=_info.get_cached_supported_video_encoders(), required=True),
+    'acodec': fields.String(enum=_info.get_cached_supported_audio_encoders(), required=True),
+    'vbitrate': fields.Integer(required=True),
+    'abitrate': fields.Integer(required=True),
+    'format': fields.String(enum=_info.get_cached_supported_formats(), required=True),
+    
     'width': fields.Integer(required=False),
     'height': fields.Integer(required=False),
-    'description': fields.String(required=False)
+    'framerate': fields.Float(required=False),
+    'audiorate': fields.Integer(required=False),
+    'crf': fields.Integer(required=False),
+    
+    'videofilter': fields.String(required=False),
+    'audiofilter': fields.String(required=False),
+    'pix_fmt': fields.String(required=False)
+})
+
+updatePresetRequestBodyFields = api.model('UpdatePresetRequestBody', {
+    'description': fields.String(required=False),
+    
+    'vcodec': fields.String(enum=_info.get_cached_supported_video_encoders()),
+    'acodec': fields.String(enum=_info.get_cached_supported_audio_encoders()),
+    'vbitrate': fields.Integer,
+    'abitrate': fields.Integer,
+    'format': fields.String(enum=_info.get_cached_supported_formats()),
+    
+    'width': fields.Integer(required=False),
+    'height': fields.Integer(required=False),
+    'framerate': fields.Float(required=False),
+    'audiorate': fields.Integer(required=False),
+    'crf': fields.Integer(required=False),
+    
+    'videofilter': fields.String(required=False),
+    'audiofilter': fields.String(required=False),
+    'pix_fmt': fields.String(required=False)
 })
 
 @ns.route('/ping', doc={
         "description": "Ping route"
     },)
-class Index(Resource):
+class Ping(Resource):
     def get(self):
         return { "data": "pong" }, 200
-
+    
 
 @ns.route(f"{ROUTE_JOBS}/<jobId>")
 @ns.doc(params={'jobId': 'The specified job\'s UUID'})
@@ -66,7 +109,7 @@ class SingleJob(Resource):
             raise NotFound(f"Object with {jobId=} was not found")
         return _handler.ConstructResponse(result)
     
-    @ns.expect(createJobRequestBodyFields)
+    @ns.expect(updateJobRequestBodyFields)
     @ns.response(code=int(HTTPStatus.OK), description="Update successful")
     def put(self, jobId):
         result = _jobService.update_job_via_put(
@@ -85,10 +128,18 @@ class SingleJob(Resource):
 
 @ns.route(f"{ROUTE_JOBS}")
 class MultiJob(Resource):
-    # TODO implement search via optional query parameters
     @ns.expect(jobSearchParser)
     def get(self):
-        return _handler.ConstructResponse(_jobService.get_all_jobs())
+        args = jobSearchParser.parse_args()
+        status = args['status_i']
+        if status:
+            status = TranscodeJobStatus(status)
+        else:
+            status = args['status_s']
+            if status:
+                status = TranscodeJobStatus[status.upper()]
+                
+        return _handler.ConstructResponse(_jobService.get_all_jobs_with_filter(status, presetId=args['preset_id']))
         
     @ns.expect(createJobRequestBodyFields)
     @ns.response(code=int(HTTPStatus.CREATED), description="Creation successful")
@@ -106,11 +157,10 @@ class SinglePreset(Resource):
             raise NotFound(f"Object with {presetId=} was not found")
         return _handler.ConstructResponse(result)
     
+    @ns.expect(updatePresetRequestBodyFields)
     def put(self, presetId):
         request_data = request.get_json()
-        preset = Preset(request_data)
-        preset._id = presetId
-        result = _presetService.insert_preset(preset)
+        result = _presetService.update_preset(request_data, presetId)
         return _handler.ConstructResponse(result)
     
     @ns.response(code=int(HTTPStatus.NO_CONTENT), description="On successful deletion, this method doesn't return a body.")
@@ -130,6 +180,14 @@ class MultiPreset(Resource):
     @ns.response(code=int(HTTPStatus.CREATED), description="Creation successful")
     def post(self):
         request_data = request.get_json()
-        preset = Preset(request_data)
+        preset = PresetHelper.from_dict(request_data)
         result = _presetService.insert_preset(preset)
         return _handler.ConstructResponse(result, HTTPStatus.CREATED)
+    
+@ns.route(f"{ROUTE_FFMPEG_INFO}")
+class FfmpegInfoRoute(Resource):
+    @ns.response(code=int(HTTPStatus.OK), description="OK")
+    def get(self):
+        result = _info.get_cached_info()
+        return _handler.ConstructResponse(result)
+    
