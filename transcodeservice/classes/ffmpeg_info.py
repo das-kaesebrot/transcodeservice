@@ -2,14 +2,88 @@ import subprocess
 import shutil
 
 class FfmpegInfo:
+    
+    _info: dict = None
+    _codecs: list[dict] = None
+    _muxers: list[dict] = None
+    _supported_video_encoders: list[str] = None
+    _supported_audio_encoders: list[str] = None
+    _supported_formats: list[str] = None
+    _supported_pix_fmts: list[str] = None
+    
     def __init__(self) -> None:
-        self._info = FfmpegInfo.get_info()
+        pass
     
     def get_cached_info(self):
         if not self._info:
             self._info = FfmpegInfo.get_info()
             
         return self._info
+    
+    def get_cached_codecs(self):
+        if not self._codecs:
+            self._codecs = FfmpegInfo.get_ffmpeg_codecs()
+            
+        return self._codecs
+    
+    def get_cached_muxers(self):
+        if not self._muxers:
+            self._muxers = FfmpegInfo.get_ffmpeg_muxers()
+            
+        return self._muxers
+    
+    def get_cached_supported_video_encoders(self) -> list[str]:        
+        if not self._supported_video_encoders:
+            self._supported_video_encoders = FfmpegInfo.get_supported_video_encoders(self.get_cached_codecs())
+            
+        return self._supported_video_encoders
+    
+    def get_cached_supported_audio_encoders(self) -> list[str]:        
+        if not self._supported_audio_encoders:
+            self._supported_audio_encoders = FfmpegInfo.get_supported_audio_encoders(self.get_cached_codecs())
+            
+        return self._supported_audio_encoders
+
+    def get_cached_supported_formats(self) -> list[str]:        
+        if not self._supported_formats:
+            self._supported_formats = FfmpegInfo.get_supported_formats(self.get_cached_muxers())
+            
+        return self._supported_formats
+    
+    @staticmethod
+    def get_supported_video_encoders(codecs: list[dict] = None) -> list[str]:
+        if not codecs:
+            codecs = FfmpegInfo.get_ffmpeg_codecs()
+            
+        encoders = []        
+        for entry in codecs:
+            _ = entry.get("capabilities")
+            if _.get("encoding_supported") and (_.get("codec_type") == "video"):
+                encoders.append(entry.get("name"))        
+        return encoders
+    
+    @staticmethod
+    def get_supported_audio_encoders(codecs: list[dict] = None) -> list[str]:
+        if not codecs:
+            codecs = FfmpegInfo.get_ffmpeg_codecs()
+            
+        encoders = []        
+        for entry in codecs:
+            _ = entry.get("capabilities")
+            if _.get("encoding_supported") and (_.get("codec_type") == "audio"):
+                encoders.append(entry.get("name"))        
+        return encoders
+    
+    @staticmethod
+    def get_supported_formats(muxers: list[dict] = None) -> list[str]:
+        if not muxers:
+            muxers = FfmpegInfo.get_ffmpeg_muxers()
+            
+        formats = []        
+        for entry in muxers:
+            formats.append(entry.get("name"))
+        
+        return formats
     
     @staticmethod
     def get_info():
@@ -52,26 +126,26 @@ class FfmpegInfo:
         return shutil.which("ffprobe")
     
     @staticmethod
-    def get_ffmpeg_codecs() -> dict:
+    def get_ffmpeg_codecs() -> list[dict]:
         result = subprocess.run("ffmpeg -v quiet -codecs".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data = result.stdout.decode('utf8').split('\n')[12:]
         return FfmpegInfo.parse_codec_rows_as_dict(data, cut_columns=0)
     
     @staticmethod
-    def get_ffmpeg_muxers() -> dict:
+    def get_ffmpeg_muxers() -> list[dict]:
         result = subprocess.run("ffmpeg -v quiet -muxers".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data = result.stdout.decode('utf8').split('\n')[4:]
         return FfmpegInfo.parse_rows_as_dict(data)
     
     @staticmethod
-    def get_ffmpeg_demuxers():
+    def get_ffmpeg_demuxers() -> list[dict]:
         result = subprocess.run("ffmpeg -v quiet -demuxers".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data = result.stdout.decode('utf8').split('\n')[4:]
         return FfmpegInfo.parse_rows_as_dict(data)
     
     
     @staticmethod
-    def parse_codec_rows_as_dict(data: list, cut_columns: int = 0, desc_from: int = 2) -> dict:
+    def parse_codec_rows_as_dict(data: list, cut_columns: int = 0, desc_from: int = 2) -> list[dict]:
         result_list = []
         
         for row in data:
@@ -88,7 +162,7 @@ class FfmpegInfo:
         return result_list
     
     @staticmethod
-    def parse_rows_as_dict(data: list, cut_columns: int = 1, desc_from: int = 2) -> dict:
+    def parse_rows_as_dict(data: list, cut_columns: int = 1, desc_from: int = 2) -> list[dict]:
         result_list = []
         
         for row in data:

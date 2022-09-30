@@ -54,11 +54,31 @@ updateJobRequestBodyFields = api.model('UpdateJobRequestBody', {
 createPresetRequestBodyFields = api.model('CreatePresetRequestBody', {
     'description': fields.String(required=False),
     
-    'vcodec': fields.String,
-    'acodec': fields.String,
+    'vcodec': fields.String(enum=_info.get_cached_supported_video_encoders(), required=True),
+    'acodec': fields.String(enum=_info.get_cached_supported_audio_encoders(), required=True),
+    'vbitrate': fields.Integer(required=True),
+    'abitrate': fields.Integer(required=True),
+    'format': fields.String(enum=_info.get_cached_supported_formats(), required=True),
+    
+    'width': fields.Integer(required=False),
+    'height': fields.Integer(required=False),
+    'framerate': fields.Float(required=False),
+    'audiorate': fields.Integer(required=False),
+    'crf': fields.Integer(required=False),
+    
+    'videofilter': fields.String(required=False),
+    'audiofilter': fields.String(required=False),
+    'pix_fmt': fields.String(required=False)
+})
+
+updatePresetRequestBodyFields = api.model('UpdatePresetRequestBody', {
+    'description': fields.String(required=False),
+    
+    'vcodec': fields.String(enum=_info.get_cached_supported_video_encoders()),
+    'acodec': fields.String(enum=_info.get_cached_supported_audio_encoders()),
     'vbitrate': fields.Integer,
     'abitrate': fields.Integer,
-    'format': fields.String,
+    'format': fields.String(enum=_info.get_cached_supported_formats()),
     
     'width': fields.Integer(required=False),
     'height': fields.Integer(required=False),
@@ -77,7 +97,7 @@ createPresetRequestBodyFields = api.model('CreatePresetRequestBody', {
 class Ping(Resource):
     def get(self):
         return { "data": "pong" }, 200
-
+    
 
 @ns.route(f"{ROUTE_JOBS}/<jobId>")
 @ns.doc(params={'jobId': 'The specified job\'s UUID'})
