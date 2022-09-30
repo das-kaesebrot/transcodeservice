@@ -24,6 +24,10 @@ class Preset(Base):
     height = Column(Integer)
     framerate = Column(Float)
     audiorate = Column(BigInteger)
+    
+    # for usage with x264/x265
+    profile = Column(String)
+    tune = Column(String)
     crf = Column(Integer)
     
     videofilter = Column(String)
