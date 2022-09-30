@@ -8,7 +8,7 @@ class PresetService:
         self._session = session
             
     def insert_preset(self, preset: Preset):
-        result = self._session.add(preset)
+        self._session.add(preset)
         self._session.commit()
         self._session.refresh(preset)
         
