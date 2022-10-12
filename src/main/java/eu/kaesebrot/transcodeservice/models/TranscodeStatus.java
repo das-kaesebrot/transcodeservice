@@ -6,7 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Column;
 import java.util.UUID;
 
-public class Status {
+public class TranscodeStatus {
     @javax.persistence.Version
     @Column(name = "version")
     private long Version;
@@ -20,12 +20,25 @@ public class Status {
     private UUID Id;
 
     @Column(name = "status_code", nullable = false)
-    private ETranscodeServiceStatus StatusCode;
+    private ETranscodeServiceStatus StatusEnum;
 
-    public Status() {
-        StatusCode = ETranscodeServiceStatus.CREATED;
+    public TranscodeStatus() {
+        StatusEnum = ETranscodeServiceStatus.CREATED;
     }
-    public Status(ETranscodeServiceStatus statusCode) {
-        StatusCode = statusCode;
+    public TranscodeStatus(ETranscodeServiceStatus statusEnum) {
+        StatusEnum = statusEnum;
+    }
+
+    public ETranscodeServiceStatus getStatusEnum() {
+        return StatusEnum;
+    }
+
+    public void setStatusEnum(ETranscodeServiceStatus status) {
+        if (status.getStatusCode() >= this.StatusEnum.getStatusCode()) {
+            this.StatusEnum = status;
+            return;
+        }
+
+        throw new IllegalArgumentException("");
     }
 }

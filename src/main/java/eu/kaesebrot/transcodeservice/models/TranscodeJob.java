@@ -47,7 +47,7 @@ public class TranscodeJob {
 
     @OneToOne
     @JoinColumn(name = "status_id")
-    private Status Status;
+    private TranscodeStatus TranscodeStatus;
 
     public long getVersion() {
         return Version;
@@ -65,8 +65,8 @@ public class TranscodeJob {
         return ModifiedAt;
     }
 
-    public eu.kaesebrot.transcodeservice.models.Status getStatus() {
-        return Status;
+    public TranscodeStatus getTranscodeStatus() {
+        return TranscodeStatus;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class TranscodeJob {
                 ", CreatedAt=" + CreatedAt +
                 ", ModifiedAt=" + ModifiedAt +
                 ", Preset=" + Preset +
-                ", Status=" + Status +
+                ", Status=" + TranscodeStatus +
                 '}';
     }
 
@@ -117,6 +117,6 @@ public class TranscodeJob {
         // retrieve the transcoding preset by ID here
         // TranscodePreset = presetService.getById...;
 
-        Status = new Status();
+        TranscodeStatus = new TranscodeStatus();
     }
 }
