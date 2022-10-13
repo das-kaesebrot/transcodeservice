@@ -13,6 +13,8 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 @Service
@@ -21,14 +23,24 @@ public class TranscodeJobService implements ITranscodeJobService
     @Autowired
     private ITranscodeJobRepository repository;
 
-    public TranscodeJobService() {
 
+    private final ReadWriteLock jobLock;
+
+    public TranscodeJobService() {
+        jobLock = new ReentrantReadWriteLock();
     }
 
     @Override
     public TranscodeJob InsertJob(TranscodeJob transcodeJob) {
         if (transcodeJob != null) {
-            repository.save(transcodeJob);
+
+            try {
+                jobLock.writeLock().lock();
+                repository.save(transcodeJob);
+            } finally {
+                jobLock.writeLock().unlock();
+            }
+
             var updatedJob = repository.findById(transcodeJob.getId());
             if (updatedJob.isPresent()) {
                 return updatedJob.get();
@@ -94,16 +106,20 @@ public class TranscodeJobService implements ITranscodeJobService
 
     @Override
     public void DeleteJob(TranscodeJob transcodeJob) {
-        repository.delete(
-                GetJob(transcodeJob.getId())
-        );
+        if (transcodeJob != null) {
+            DeleteJobById(transcodeJob.getId());
+        }
     }
 
     @Override
-    public void DeleteJobById(UUID id) throws EntityNotFoundException {
-        repository.delete(
-                GetJob(id)
-        );
+    public void DeleteJobById(UUID id) {
+        try {
+            jobLock.writeLock().lock();
+
+            repository.deleteById(id);
+        } finally {
+            jobLock.writeLock().unlock();
+        }
     }
 
     @Override
@@ -113,9 +129,14 @@ public class TranscodeJobService implements ITranscodeJobService
 
     @Override
     public void DeleteByStatusList(List<ETranscodeServiceStatus> statusList) {
-        repository.deleteAll(
-                GetJobsByStatusList(statusList)
-        );
+        var result = GetJobsByStatusList(statusList);
+
+        try {
+            jobLock.writeLock().lock();
+            repository.deleteAll(result);
+        } finally {
+            jobLock.writeLock().unlock();
+        }
     }
 
     @Override
