@@ -5,11 +5,16 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
 // TODO
-public class TranscodePreset {
+@Entity
+@Table(name = "transcode_preset")
+public class TranscodePreset implements Serializable {
 
     @javax.persistence.Version
     @Column(name = "version")

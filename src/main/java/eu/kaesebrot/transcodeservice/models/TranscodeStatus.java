@@ -4,9 +4,14 @@ import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class TranscodeStatus {
+@Entity
+@Table(name = "transcode_status")
+public class TranscodeStatus implements Serializable {
     @javax.persistence.Version
     @Column(name = "version")
     private long Version;

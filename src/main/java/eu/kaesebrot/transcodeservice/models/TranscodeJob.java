@@ -8,11 +8,16 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-public class TranscodeJob {
+@Entity
+@Table(name = "transcode_job")
+public class TranscodeJob implements Serializable {
     @javax.persistence.Version
     @Column(name = "version")
     private long Version;
@@ -118,5 +123,9 @@ public class TranscodeJob {
         // TranscodePreset = presetService.getById...;
 
         TranscodeStatus = new TranscodeStatus();
+    }
+
+    public TranscodeJob() {
+
     }
 }
