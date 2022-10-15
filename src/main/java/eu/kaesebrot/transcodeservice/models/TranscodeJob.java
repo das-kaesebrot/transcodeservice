@@ -1,8 +1,10 @@
 package eu.kaesebrot.transcodeservice.models;
 
+import eu.kaesebrot.transcodeservice.services.ITranscodePresetService;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -18,6 +20,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "transcode_job")
 public class TranscodeJob implements Serializable {
+
+    @Autowired
+    private ITranscodePresetService presetService;
+
     @javax.persistence.Version
     @Column(name = "version")
     private long Version;
@@ -112,15 +118,28 @@ public class TranscodeJob implements Serializable {
         Preset = preset;
     }
 
+    public void setPreset(UUID presetId) {
+        Preset = presetService.GetPreset(presetId);
+    }
+
     public TranscodeJob(
             String inFile,
             String outFolder,
             UUID presetId) {
         InFile = inFile;
         OutFolder = outFolder;
+        Preset = presetService.GetPreset(presetId);
 
-        // retrieve the transcoding preset by ID here
-        // TranscodePreset = presetService.getById...;
+        TranscodeStatus = new TranscodeStatus();
+    }
+
+    public TranscodeJob(
+            String inFile,
+            String outFolder,
+            TranscodePreset preset) {
+        InFile = inFile;
+        OutFolder = outFolder;
+        Preset = preset;
 
         TranscodeStatus = new TranscodeStatus();
     }
