@@ -2,6 +2,7 @@ package eu.kaesebrot.transcodeservice.services;
 
 import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.transcodeservice.models.TranscodeJob;
+import eu.kaesebrot.transcodeservice.models.TranscodeJobUpdate;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -58,6 +59,23 @@ public class TranscodeJobService implements ITranscodeJobService
     @Override
     public TranscodeJob UpdateJob(Dictionary<String, Object> updateData, UUID jobId) {
         throw new NotYetImplementedException();
+    }
+
+    @Override
+    public TranscodeJob UpdateJob(TranscodeJobUpdate updateData, UUID jobId) {
+        var job = GetJob(jobId);
+
+        if (updateData.getInFile().isPresent()) {
+            job.setInFile(updateData.getInFile().get());
+        }
+        if (updateData.getOutFolder().isPresent()) {
+            job.setOutFolder(updateData.getOutFolder().get());
+        }
+        if (updateData.getPresetId().isPresent()) {
+            job.setPreset(updateData.getPresetId().get());
+        }
+
+        return UpdateJob(job);
     }
 
     @Override

@@ -2,6 +2,7 @@ package eu.kaesebrot.transcodeservice.services;
 
 import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.transcodeservice.models.TranscodeJob;
+import eu.kaesebrot.transcodeservice.models.TranscodeJobUpdate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,6 +25,7 @@ public interface ITranscodeJobService
     public TranscodeJob InsertJob(TranscodeJob transcodeJob);
     public TranscodeJob UpdateJob(TranscodeJob transcodeJob);
     public TranscodeJob UpdateJob(Dictionary<String, Object> updateData, UUID jobId);
+    public TranscodeJob UpdateJob(TranscodeJobUpdate updateData, UUID jobId);
     public long CountAllJobs();
     public long CountSuccessfulJobs();
     public long CountFailedJobs();
