@@ -3,6 +3,7 @@ package eu.kaesebrot.transcodeservice.services;
 import eu.kaesebrot.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.transcodeservice.models.TranscodePreset;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+@Service
 public class TranscodePresetService implements ITranscodePresetService {
 
     @Autowired
