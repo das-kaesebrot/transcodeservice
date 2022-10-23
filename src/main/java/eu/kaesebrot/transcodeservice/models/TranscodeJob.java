@@ -20,10 +20,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "transcode_job")
 public class TranscodeJob implements Serializable {
-
-    @Autowired
-    private ITranscodePresetService presetService;
-
     @javax.persistence.Version
     @Column(name = "version")
     private long Version;
