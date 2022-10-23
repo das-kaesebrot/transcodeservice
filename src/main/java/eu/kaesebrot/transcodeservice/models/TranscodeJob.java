@@ -118,21 +118,6 @@ public class TranscodeJob implements Serializable {
         Preset = preset;
     }
 
-    public void setPreset(UUID presetId) {
-        Preset = presetService.GetPreset(presetId);
-    }
-
-    public TranscodeJob(
-            String inFile,
-            String outFolder,
-            UUID presetId) {
-        InFile = inFile;
-        OutFolder = outFolder;
-        Preset = presetService.GetPreset(presetId);
-
-        TranscodeStatus = new TranscodeStatus();
-    }
-
     public TranscodeJob(
             String inFile,
             String outFolder,
