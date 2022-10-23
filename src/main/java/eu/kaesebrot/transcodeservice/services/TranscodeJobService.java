@@ -71,8 +71,8 @@ public class TranscodeJobService implements ITranscodeJobService
         if (updateData.getOutFolder().isPresent()) {
             job.setOutFolder(updateData.getOutFolder().get());
         }
-        if (updateData.getPresetId().isPresent()) {
-            job.setPreset(updateData.getPresetId().get());
+        if (updateData.getPreset().isPresent()) {
+            job.setPreset(updateData.getPreset().get());
         }
 
         return UpdateJob(job);
