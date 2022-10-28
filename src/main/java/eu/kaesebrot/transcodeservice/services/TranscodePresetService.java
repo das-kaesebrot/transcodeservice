@@ -41,7 +41,7 @@ public class TranscodePresetService implements ITranscodePresetService {
 
         try {
             presetLock.writeLock().lock();
-            repository.save(preset);
+            repository.saveAndFlush(preset);
         } finally {
             presetLock.writeLock().unlock();
         }
