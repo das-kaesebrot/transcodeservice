@@ -1,12 +1,13 @@
 package eu.kaesebrot.transcodeservice.models;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class TranscodeJobCreation implements Serializable {
     private String InFile;
 
     private String OutFolder;
-    private long PresetId;
+    private UUID PresetId;
 
     public String getInFile() {
         return InFile;
@@ -24,15 +25,15 @@ public class TranscodeJobCreation implements Serializable {
         OutFolder = outFolder;
     }
 
-    public long getPresetId() {
+    public UUID getPresetId() {
         return PresetId;
     }
 
-    public void setPresetId(long presetId) {
+    public void setPresetId(UUID presetId) {
         PresetId = presetId;
     }
 
-    public TranscodeJobCreation(String inFile, String outFolder, long presetId) {
+    public TranscodeJobCreation(String inFile, String outFolder, UUID presetId) {
         InFile = inFile;
         OutFolder = outFolder;
         PresetId = presetId;
