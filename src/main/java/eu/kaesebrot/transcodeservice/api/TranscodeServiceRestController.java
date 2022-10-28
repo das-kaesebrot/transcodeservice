@@ -1,7 +1,7 @@
 package eu.kaesebrot.transcodeservice.api;
 
 import eu.kaesebrot.transcodeservice.models.TranscodeJob;
-import eu.kaesebrot.transcodeservice.models.TranscodeJobNew;
+import eu.kaesebrot.transcodeservice.models.TranscodeJobCreation;
 import eu.kaesebrot.transcodeservice.models.TranscodeJobUpdate;
 import eu.kaesebrot.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.transcodeservice.services.ITranscodeJobService;
@@ -33,7 +33,7 @@ public class TranscodeServiceRestController {
     }
 
     @PostMapping(value = "jobs")
-    public TranscodeJob CreateNewJob(TranscodeJobNew jobData) {
+    public TranscodeJob CreateNewJob(TranscodeJobCreation jobData) {
         var preset = presetService.GetPreset(jobData.getPresetId());
         var job = new TranscodeJob(jobData.getInFile(), jobData.getOutFolder(), preset);
         return jobService.InsertJob(job);

@@ -1,13 +1,8 @@
 package eu.kaesebrot.transcodeservice.models;
 
-import eu.kaesebrot.transcodeservice.services.ITranscodePresetService;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.Serializable;
-import java.util.Optional;
-import java.util.UUID;
 
-public class TranscodeJobNew implements Serializable {
+public class TranscodeJobCreation implements Serializable {
     private String InFile;
 
     private String OutFolder;
@@ -37,7 +32,7 @@ public class TranscodeJobNew implements Serializable {
         PresetId = presetId;
     }
 
-    public TranscodeJobNew(String inFile, String outFolder, long presetId) {
+    public TranscodeJobCreation(String inFile, String outFolder, long presetId) {
         InFile = inFile;
         OutFolder = outFolder;
         PresetId = presetId;
