@@ -32,4 +32,20 @@ public class TranscodePresetService implements ITranscodePresetService {
         return GetPresetOptional(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("No TranscodePreset found by id={%s}", id)));
     }
+
+    @Override
+    public TranscodePreset InsertPreset(TranscodePreset preset) {
+        if (preset == null) {
+            return null;
+        }
+
+        try {
+            presetLock.writeLock().lock();
+            repository.save(preset);
+        } finally {
+            presetLock.writeLock().unlock();
+        }
+
+        return GetPreset(preset.getId());
+    }
 }
