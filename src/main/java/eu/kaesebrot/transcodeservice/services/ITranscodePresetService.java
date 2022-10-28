@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface ITranscodePresetService {
     Optional<TranscodePreset> GetPresetOptional(UUID id);
-
     TranscodePreset GetPreset(UUID id) throws EntityNotFoundException;
+    TranscodePreset InsertPreset(TranscodePreset preset);
 }
