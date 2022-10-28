@@ -33,7 +33,7 @@ public class TranscodeServiceRestController {
         return jobService.InsertJob(job);
     }
 
-    @GetMapping(value = "jos/{id}")
+    @GetMapping(value = "jobs/{id}")
     public TranscodeJob GetJob(@PathVariable UUID id) {
         return jobService.GetJob(id);
     }
