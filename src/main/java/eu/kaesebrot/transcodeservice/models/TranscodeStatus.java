@@ -3,9 +3,7 @@ package eu.kaesebrot.transcodeservice.models;
 import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -26,6 +24,9 @@ public class TranscodeStatus implements Serializable {
 
     @Column(name = "status_code", nullable = false)
     private ETranscodeServiceStatus StatusEnum;
+
+    @OneToOne(mappedBy = "TranscodeStatus")
+    private TranscodeJob Job;
 
     public TranscodeStatus() {
         StatusEnum = ETranscodeServiceStatus.CREATED;

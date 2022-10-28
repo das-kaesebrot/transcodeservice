@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Set;
 import java.util.UUID;
 
 // TODO
@@ -29,6 +30,9 @@ public class TranscodePreset implements Serializable {
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
     private Timestamp ModifiedAt;
+
+    @OneToMany(mappedBy = "Preset")
+    private Set<TranscodeJob> Jobs;
 
     public Timestamp getCreatedAt() {
         return CreatedAt;

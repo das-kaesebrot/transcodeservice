@@ -6,12 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -48,7 +43,7 @@ public class TranscodeJob implements Serializable {
     @Column(name = "modified_at", nullable = false)
     private Timestamp ModifiedAt;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "preset_id")
     private TranscodePreset Preset;
 
