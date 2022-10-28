@@ -189,7 +189,7 @@ public class TranscodeJobService implements ITranscodeJobService
     }
 
     @Override
-    public List<TranscodeJob> GetJobsUsingPresetId(UUID presetId) {
+    public List<TranscodeJob> GetJobsUsingPresetId(long presetId) {
         return repository
                 .findAll()
                 .stream()
