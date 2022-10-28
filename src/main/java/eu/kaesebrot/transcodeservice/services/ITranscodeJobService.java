@@ -21,7 +21,7 @@ public interface ITranscodeJobService
     public List<TranscodeJob> GetRunningJobs();
     public List<TranscodeJob> GetJobsByStatusList(List<ETranscodeServiceStatus> statusList) throws EntityNotFoundException;
     public Stream<TranscodeJob> GetJobStreamByStatusList(List<ETranscodeServiceStatus> statusList) throws EntityNotFoundException;
-    public List<TranscodeJob> GetJobsUsingPresetId(long presetId);
+    public List<TranscodeJob> GetJobsUsingPresetId(UUID presetId);
     public TranscodeJob InsertJob(TranscodeJob transcodeJob);
     public TranscodeJob UpdateJob(TranscodeJob transcodeJob);
     public TranscodeJob UpdateJob(Dictionary<String, Object> updateData, UUID jobId);

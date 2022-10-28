@@ -35,13 +35,13 @@ public class TranscodeJobUpdate implements Serializable {
         return Preset;
     }
 
-    public void setPreset(Optional<Long> presetId) {
+    public void setPreset(Optional<UUID> presetId) {
         if (presetId.isPresent()) {
             Preset = presetService.GetPresetOptional(presetId.get());
         }
     }
 
-    public TranscodeJobUpdate(Optional<String> inFile, Optional<String> outFolder, Optional<Long> presetId) {
+    public TranscodeJobUpdate(Optional<String> inFile, Optional<String> outFolder, Optional<UUID> presetId) {
         InFile = inFile;
         OutFolder = outFolder;
         if (presetId.isPresent()) {
