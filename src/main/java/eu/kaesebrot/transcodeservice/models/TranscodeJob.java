@@ -20,6 +20,7 @@ public class TranscodeJob implements Serializable {
     private long Version;
 
     @Id
+    @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"

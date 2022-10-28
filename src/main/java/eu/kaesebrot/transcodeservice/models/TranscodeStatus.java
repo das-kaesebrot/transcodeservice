@@ -15,6 +15,7 @@ public class TranscodeStatus implements Serializable {
     private long Version;
 
     @javax.persistence.Id
+    @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
