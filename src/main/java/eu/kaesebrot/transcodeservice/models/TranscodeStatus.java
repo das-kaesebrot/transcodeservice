@@ -36,6 +36,14 @@ public class TranscodeStatus implements Serializable {
         StatusEnum = statusEnum;
     }
 
+    public long getVersion() {
+        return Version;
+    }
+
+    public UUID getId() {
+        return Id;
+    }
+
     public ETranscodeServiceStatus getStatusEnum() {
         return StatusEnum;
     }
