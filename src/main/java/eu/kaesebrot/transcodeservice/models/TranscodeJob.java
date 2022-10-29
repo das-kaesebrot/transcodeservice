@@ -48,7 +48,7 @@ public class TranscodeJob implements Serializable {
     @JoinColumn(name = "preset_id")
     private TranscodePreset Preset;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "status_id")
     private TranscodeStatus TranscodeStatus;
 
