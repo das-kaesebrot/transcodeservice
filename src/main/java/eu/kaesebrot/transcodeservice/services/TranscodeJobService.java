@@ -37,7 +37,7 @@ public class TranscodeJobService implements ITranscodeJobService
 
             try {
                 jobLock.writeLock().lock();
-                repository.save(transcodeJob);
+                repository.saveAndFlush(transcodeJob);
             } finally {
                 jobLock.writeLock().unlock();
             }
