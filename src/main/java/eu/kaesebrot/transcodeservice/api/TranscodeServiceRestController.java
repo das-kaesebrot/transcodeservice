@@ -33,7 +33,7 @@ public class TranscodeServiceRestController {
     }
 
     @PostMapping(value = "jobs")
-    public TranscodeJob CreateNewJob(TranscodeJobCreation jobData) {
+    public TranscodeJob CreateNewJob(@RequestBody TranscodeJobCreation jobData) {
         var preset = presetService.GetPreset(jobData.getPresetId());
         var job = new TranscodeJob(jobData.getInFile(), jobData.getOutFolder(), preset);
         return jobService.InsertJob(job);
