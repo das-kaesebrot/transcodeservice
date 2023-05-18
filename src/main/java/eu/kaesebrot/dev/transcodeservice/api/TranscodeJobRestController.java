@@ -6,7 +6,6 @@ import eu.kaesebrot.dev.transcodeservice.services.ITranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,11 +17,14 @@ import java.util.UUID;
 @RequestMapping("/api/v1/transcodeservice")
 @Tag(name = "job", description = "The TranscodeJob API")
 public class TranscodeJobRestController {
-    @Autowired
-    private ITranscodeJobService jobService;
+    private final ITranscodeJobService jobService;
 
-    @Autowired
-    private ITranscodePresetService presetService;
+    private final ITranscodePresetService presetService;
+
+    public TranscodeJobRestController(ITranscodeJobService jobService, ITranscodePresetService presetService) {
+        this.jobService = jobService;
+        this.presetService = presetService;
+    }
 
     @GetMapping(
             value = "ping",

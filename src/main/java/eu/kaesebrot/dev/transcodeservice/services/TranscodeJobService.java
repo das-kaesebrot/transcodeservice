@@ -4,7 +4,6 @@ import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJobUpdate;
 import org.hibernate.cfg.NotYetImplementedException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,14 +20,13 @@ import java.util.stream.Stream;
 @Service
 public class TranscodeJobService implements ITranscodeJobService
 {
-    @Autowired
-    private ITranscodeJobRepository repository;
-
+    private final ITranscodeJobRepository repository;
 
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobService() {
+    public TranscodeJobService(ITranscodeJobRepository repository) {
         jobLock = new ReentrantReadWriteLock();
+        this.repository = repository;
     }
 
     @Override

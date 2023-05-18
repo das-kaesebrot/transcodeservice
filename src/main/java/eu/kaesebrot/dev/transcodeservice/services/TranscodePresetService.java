@@ -1,7 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -13,13 +12,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Service
 public class TranscodePresetService implements ITranscodePresetService {
 
-    @Autowired
-    private ITranscodePresetRepository repository;
+    private final ITranscodePresetRepository repository;
 
     private final ReadWriteLock presetLock;
 
-    public TranscodePresetService() {
+    public TranscodePresetService(ITranscodePresetRepository repository) {
         presetLock = new ReentrantReadWriteLock();
+        this.repository = repository;
     }
 
     @Override
