@@ -1,7 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
+import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeStatus;
-import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ public class TranscodeStatusRestController {
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.OK)
-    public TranscodeStatus ChangeStatus(@PathVariable UUID id, @RequestBody ETranscodeServiceStatus status) {
+    public TranscodeStatus ChangeStatus(@PathVariable UUID id, @RequestBody StatusPutRequest status) {
         // TODO
         return null;
     }
