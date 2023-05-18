@@ -1,4 +1,4 @@
-package eu.kaesebrot.transcodeservice;
+package eu.kaesebrot.dev.transcodeservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

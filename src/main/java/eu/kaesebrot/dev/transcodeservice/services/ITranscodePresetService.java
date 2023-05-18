@@ -1,6 +1,6 @@
-package eu.kaesebrot.transcodeservice.services;
+package eu.kaesebrot.dev.transcodeservice.services;
 
-import eu.kaesebrot.transcodeservice.models.TranscodePreset;
+import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;

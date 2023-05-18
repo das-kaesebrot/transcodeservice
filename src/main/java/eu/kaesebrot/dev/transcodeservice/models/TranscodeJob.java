@@ -1,10 +1,8 @@
-package eu.kaesebrot.transcodeservice.models;
+package eu.kaesebrot.dev.transcodeservice.models;
 
-import eu.kaesebrot.transcodeservice.services.ITranscodePresetService;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

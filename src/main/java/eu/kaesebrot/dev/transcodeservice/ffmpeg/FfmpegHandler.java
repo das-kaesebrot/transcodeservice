@@ -1,4 +1,4 @@
-package eu.kaesebrot.transcodeservice.ffmpeg;
+package eu.kaesebrot.dev.transcodeservice.ffmpeg;
 
 import java.util.List;
 

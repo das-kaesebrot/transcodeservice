@@ -1,6 +1,6 @@
-package eu.kaesebrot.transcodeservice.models;
+package eu.kaesebrot.dev.transcodeservice.models;
 
-import eu.kaesebrot.transcodeservice.services.ITranscodePresetService;
+import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;

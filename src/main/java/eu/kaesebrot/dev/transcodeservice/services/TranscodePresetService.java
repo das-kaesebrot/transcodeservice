@@ -1,7 +1,6 @@
-package eu.kaesebrot.transcodeservice.services;
+package eu.kaesebrot.dev.transcodeservice.services;
 
-import eu.kaesebrot.transcodeservice.models.TranscodeJob;
-import eu.kaesebrot.transcodeservice.models.TranscodePreset;
+import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

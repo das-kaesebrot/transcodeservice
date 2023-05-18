@@ -1,4 +1,4 @@
-package eu.kaesebrot.transcodeservice.models;
+package eu.kaesebrot.dev.transcodeservice.models;
 
 import java.io.Serializable;
 import java.util.UUID;

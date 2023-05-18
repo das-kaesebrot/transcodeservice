@@ -1,4 +1,4 @@
-package eu.kaesebrot.transcodeservice.models;
+package eu.kaesebrot.dev.transcodeservice.models;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;

@@ -1,4 +1,4 @@
-package eu.kaesebrot.transcodeservice.constants;
+package eu.kaesebrot.dev.transcodeservice.constants;
 
 public enum ETranscodeServiceStatus {
     CREATED (0),

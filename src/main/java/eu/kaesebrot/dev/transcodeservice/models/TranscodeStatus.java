@@ -1,6 +1,6 @@
-package eu.kaesebrot.transcodeservice.models;
+package eu.kaesebrot.dev.transcodeservice.models;
 
-import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
+import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;

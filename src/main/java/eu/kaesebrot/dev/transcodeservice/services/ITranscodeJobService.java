@@ -1,8 +1,8 @@
-package eu.kaesebrot.transcodeservice.services;
+package eu.kaesebrot.dev.transcodeservice.services;
 
-import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
-import eu.kaesebrot.transcodeservice.models.TranscodeJob;
-import eu.kaesebrot.transcodeservice.models.TranscodeJobUpdate;
+import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
+import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
+import eu.kaesebrot.dev.transcodeservice.models.TranscodeJobUpdate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,7 +1,7 @@
-package eu.kaesebrot.transcodeservice.api;
+package eu.kaesebrot.dev.transcodeservice.api;
 
-import eu.kaesebrot.transcodeservice.constants.ETranscodeServiceStatus;
-import eu.kaesebrot.transcodeservice.models.TranscodeStatus;
+import eu.kaesebrot.dev.transcodeservice.models.TranscodeStatus;
+import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
