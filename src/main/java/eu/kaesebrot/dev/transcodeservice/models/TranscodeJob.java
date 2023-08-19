@@ -1,14 +1,12 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Entity
 @Table(name = "transcode_job")
@@ -18,13 +16,9 @@ public class TranscodeJob implements Serializable {
     private long Version;
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-    private UUID Id;
+    @GeneratedValue
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long Id;
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "in_file", nullable = false)
@@ -54,7 +48,7 @@ public class TranscodeJob implements Serializable {
         return Version;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return Id;
     }
 

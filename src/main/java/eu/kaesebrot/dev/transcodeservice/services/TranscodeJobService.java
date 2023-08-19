@@ -2,7 +2,7 @@ package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
-import eu.kaesebrot.dev.transcodeservice.models.TranscodeJobUpdate;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,6 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
@@ -32,7 +31,6 @@ public class TranscodeJobService implements ITranscodeJobService
     @Override
     public TranscodeJob InsertJob(TranscodeJob transcodeJob) {
         if (transcodeJob != null) {
-
             try {
                 jobLock.writeLock().lock();
                 repository.saveAndFlush(transcodeJob);
@@ -55,12 +53,12 @@ public class TranscodeJobService implements ITranscodeJobService
     }
 
     @Override
-    public TranscodeJob UpdateJob(Dictionary<String, Object> updateData, UUID jobId) {
+    public TranscodeJob UpdateJob(Dictionary<String, Object> updateData, Long jobId) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public TranscodeJob UpdateJob(TranscodeJobUpdate updateData, UUID jobId) {
+    public TranscodeJob UpdateJob(TranscodeJobUpdate updateData, Long jobId) {
         var job = GetJob(jobId);
 
         if (updateData.getInFile().isPresent()) {
@@ -99,13 +97,13 @@ public class TranscodeJobService implements ITranscodeJobService
     }
 
     @Override
-    public Optional<TranscodeJob> GetJobOptional(UUID id) {
+    public Optional<TranscodeJob> GetJobOptional(Long id) {
         return repository
                 .findById(id);
     }
 
     @Override
-    public TranscodeJob GetJob(UUID id) throws EntityNotFoundException {
+    public TranscodeJob GetJob(Long id) throws EntityNotFoundException {
         return GetJobOptional(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("No TranscodeJob found by id={%s}", id)));
     }
@@ -128,7 +126,7 @@ public class TranscodeJobService implements ITranscodeJobService
     }
 
     @Override
-    public void DeleteJobById(UUID id) {
+    public void DeleteJobById(Long id) {
         try {
             jobLock.writeLock().lock();
 
@@ -187,7 +185,7 @@ public class TranscodeJobService implements ITranscodeJobService
     }
 
     @Override
-    public List<TranscodeJob> GetJobsUsingPresetId(UUID presetId) {
+    public List<TranscodeJob> GetJobsUsingPresetId(Long presetId) {
         return repository
                 .findAll()
                 .stream()

@@ -1,7 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
-import eu.kaesebrot.dev.transcodeservice.models.TranscodeJobCreation;
-import eu.kaesebrot.dev.transcodeservice.models.TranscodeJobUpdate;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
@@ -60,7 +60,7 @@ public class TranscodeJobRestController {
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.OK)
-    public TranscodeJob GetJob(@PathVariable UUID id) {
+    public TranscodeJob GetJob(@PathVariable Long id) {
         return jobService.GetJob(id);
     }
 
@@ -70,7 +70,7 @@ public class TranscodeJobRestController {
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.OK)
-    public TranscodeJob UpdateJob(@PathVariable UUID id, TranscodeJobUpdate transcodeJobUpdate) {
+    public TranscodeJob UpdateJob(@PathVariable Long id, TranscodeJobUpdate transcodeJobUpdate) {
         return jobService.UpdateJob(transcodeJobUpdate, id);
     }
 }

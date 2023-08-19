@@ -1,5 +1,6 @@
-package eu.kaesebrot.dev.transcodeservice.models;
+package eu.kaesebrot.dev.transcodeservice.models.rest;
 
+import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,13 +36,13 @@ public class TranscodeJobUpdate implements Serializable {
         return Preset;
     }
 
-    public void setPreset(Optional<UUID> presetId) {
+    public void setPreset(Optional<Long> presetId) {
         if (presetId.isPresent()) {
             Preset = presetService.GetPresetOptional(presetId.get());
         }
     }
 
-    public TranscodeJobUpdate(Optional<String> inFile, Optional<String> outFolder, Optional<UUID> presetId) {
+    public TranscodeJobUpdate(Optional<String> inFile, Optional<String> outFolder, Optional<Long> presetId) {
         InFile = inFile;
         OutFolder = outFolder;
         if (presetId.isPresent()) {

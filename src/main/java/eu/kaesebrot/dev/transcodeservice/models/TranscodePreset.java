@@ -1,14 +1,12 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Set;
-import java.util.UUID;
 
 // TODO
 @Entity
@@ -20,13 +18,9 @@ public class TranscodePreset implements Serializable {
     private long Version;
 
     @javax.persistence.Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", columnDefinition = "BINARY(16)", updatable = false, nullable = false)
-    private UUID Id;
+    @GeneratedValue
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long Id;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -51,7 +45,7 @@ public class TranscodePreset implements Serializable {
         return Version;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return Id;
     }
 
