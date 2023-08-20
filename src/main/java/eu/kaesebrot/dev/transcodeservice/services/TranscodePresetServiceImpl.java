@@ -9,13 +9,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
-public class TranscodePresetService implements ITranscodePresetService {
+public class TranscodePresetServiceImpl implements ITranscodePresetService {
 
     private final ITranscodePresetRepository repository;
 
     private final ReadWriteLock presetLock;
 
-    public TranscodePresetService(ITranscodePresetRepository repository) {
+    public TranscodePresetServiceImpl(ITranscodePresetRepository repository) {
         presetLock = new ReentrantReadWriteLock();
         this.repository = repository;
     }
