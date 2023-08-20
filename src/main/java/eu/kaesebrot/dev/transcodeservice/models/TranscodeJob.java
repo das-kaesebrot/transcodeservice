@@ -1,5 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
+import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -40,9 +41,7 @@ public class TranscodeJob implements Serializable {
     @JoinColumn(name = "preset_id")
     private TranscodePreset Preset;
 
-    @OneToOne(cascade = {CascadeType.ALL})
-    @JoinColumn(name = "status_id")
-    private TranscodeStatus TranscodeStatus;
+    private ETranscodeServiceStatus TranscodeStatus;
 
     public long getVersion() {
         return Version;
@@ -60,7 +59,7 @@ public class TranscodeJob implements Serializable {
         return ModifiedAt;
     }
 
-    public TranscodeStatus getTranscodeStatus() {
+    public ETranscodeServiceStatus getTranscodeStatus() {
         return TranscodeStatus;
     }
 
@@ -102,6 +101,14 @@ public class TranscodeJob implements Serializable {
         Preset = preset;
     }
 
+    public void setTranscodeStatus(ETranscodeServiceStatus status) {
+        if (status.ordinal() < TranscodeStatus.ordinal()) {
+            throw new IllegalArgumentException("Status can't be set to a lower value!");
+        }
+
+        TranscodeStatus = status;
+    }
+
     public TranscodeJob(
             String inFile,
             String outFolder,
@@ -110,7 +117,7 @@ public class TranscodeJob implements Serializable {
         OutFolder = outFolder;
         Preset = preset;
 
-        TranscodeStatus = new TranscodeStatus();
+        TranscodeStatus = ETranscodeServiceStatus.CREATED;
     }
 
     public TranscodeJob() {
