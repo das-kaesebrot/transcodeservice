@@ -1,8 +1,18 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
+import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
+import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import org.springframework.data.jpa.repository.JpaRepository;
 
- public interface ITranscodeJobRepository extends JpaRepository<TranscodeJob, Long> {
+import java.util.List;
+import java.util.stream.Stream;
 
+public interface ITranscodeJobRepository extends JpaRepository<TranscodeJob, Long> {
+    void deleteAllByTranscodeStatus(ETranscodeServiceStatus transcodeStatus);
+    void deleteAllByTranscodeStatusIn(List<ETranscodeServiceStatus> transcodeServiceStatuses);
+    Stream<TranscodeJob> getByTranscodeStatusIn(List<ETranscodeServiceStatus> transcodeStatuses);
+    Stream<TranscodeJob> getByPreset(TranscodePreset preset);
+    long countByTranscodeStatus(ETranscodeServiceStatus status);
+    void deleteById(Long id);
 }
