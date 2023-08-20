@@ -4,7 +4,7 @@ import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
-import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
+import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 public class TranscodeJobRestController {
     private final TranscodeJobService jobService;
 
-    private final ITranscodePresetService presetService;
+    private final TranscodePresetService presetService;
 
-    public TranscodeJobRestController(TranscodeJobService jobService, ITranscodePresetService presetService) {
+    public TranscodeJobRestController(TranscodeJobService jobService, TranscodePresetService presetService) {
         this.jobService = jobService;
         this.presetService = presetService;
     }

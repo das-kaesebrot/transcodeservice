@@ -1,16 +1,13 @@
 package eu.kaesebrot.dev.transcodeservice.models.rest;
 
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
-import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
-import org.springframework.beans.factory.annotation.Autowired;
+import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
 
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.UUID;
 
 public class TranscodeJobUpdate implements Serializable {
-    @Autowired
-    private ITranscodePresetService presetService;
+    private TranscodePresetService presetService;
 
     private Optional<String> InFile;
 

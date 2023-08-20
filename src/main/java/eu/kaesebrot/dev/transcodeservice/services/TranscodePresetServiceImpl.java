@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
-public class TranscodePresetServiceImpl implements ITranscodePresetService {
+public class TranscodePresetServiceImpl implements TranscodePresetService {
 
     private final ITranscodePresetRepository repository;
 
