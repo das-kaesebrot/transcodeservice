@@ -3,7 +3,7 @@ package eu.kaesebrot.dev.transcodeservice.api;
 import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
-import eu.kaesebrot.dev.transcodeservice.services.ITranscodeJobService;
+import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/transcodeservice")
 @Tag(name = "job", description = "The TranscodeJob API")
 public class TranscodeJobRestController {
-    private final ITranscodeJobService jobService;
+    private final TranscodeJobService jobService;
 
     private final ITranscodePresetService presetService;
 
-    public TranscodeJobRestController(ITranscodeJobService jobService, ITranscodePresetService presetService) {
+    public TranscodeJobRestController(TranscodeJobService jobService, ITranscodePresetService presetService) {
         this.jobService = jobService;
         this.presetService = presetService;
     }

@@ -10,7 +10,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-public interface ITranscodeJobService
+public interface TranscodeJobService
 {
     public Optional<TranscodeJob> GetJobOptional(Long id);
     public TranscodeJob GetJob(Long id) throws EntityNotFoundException;
