@@ -16,13 +16,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Service
 public class TranscodeJobServiceImpl implements TranscodeJobService
 {
-    private final ITranscodeJobRepository repository;
+    private final ITranscodeJobRepository jobRepository;
+    private final ITranscodePresetRepository presetRepository;
 
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobServiceImpl(ITranscodeJobRepository repository) {
+    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository) {
         jobLock = new ReentrantReadWriteLock();
-        this.repository = repository;
+        this.jobRepository = jobRepository;
+        this.presetRepository = presetRepository;
     }
 
     @Override
@@ -30,12 +32,12 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
         if (transcodeJob != null) {
             try {
                 jobLock.writeLock().lock();
-                repository.saveAndFlush(transcodeJob);
+                jobRepository.saveAndFlush(transcodeJob);
             } finally {
                 jobLock.writeLock().unlock();
             }
 
-            var updatedJob = repository.findById(transcodeJob.getId());
+            var updatedJob = jobRepository.findById(transcodeJob.getId());
             if (updatedJob.isPresent()) {
                 return updatedJob.get();
             }
@@ -59,8 +61,8 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
         if (updateData.getOutFolder().isPresent()) {
             job.setOutFolder(updateData.getOutFolder().get());
         }
-        if (updateData.getPreset().isPresent()) {
-            job.setPreset(updateData.getPreset().get());
+        if (updateData.getPresetId().isPresent()) {
+            job.setPreset(presetRepository.findById(updateData.getPresetId().get()).get());
         }
 
         return updateJob(job);
@@ -68,7 +70,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 
     @Override
     public Optional<TranscodeJob> getJobOptional(Long id) {
-        return repository
+        return jobRepository
                 .findById(id);
     }
 
@@ -80,16 +82,16 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 
     @Override
     public Page<TranscodeJob> getAllJobsPaged(Pageable pageable) {
-        return repository.findAll(pageable);
+        return jobRepository.findAll(pageable);
     }
 
     @Override
     public void deleteJobById(Long id) {
-        repository.deleteById(id);
+        jobRepository.deleteById(id);
     }
 
     @Override
     public void deleteByStatusList(List<ETranscodeServiceStatus> statusList) {
-        repository.deleteAllByTranscodeStatusIn(statusList);
+        jobRepository.deleteAllByTranscodeStatusIn(statusList);
     }
 }
