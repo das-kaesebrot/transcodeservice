@@ -4,10 +4,12 @@ import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+@Repository
 public interface ITranscodeJobRepository extends JpaRepository<TranscodeJob, Long> {
     void deleteAllByTranscodeStatus(ETranscodeServiceStatus transcodeStatus);
     void deleteAllByTranscodeStatusIn(List<ETranscodeServiceStatus> transcodeServiceStatuses);
