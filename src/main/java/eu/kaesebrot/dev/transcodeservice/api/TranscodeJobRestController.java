@@ -39,7 +39,7 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public Page<TranscodeJob> GetAllJobs(Pageable pageable) {
-        return jobService.GetAllJobsPaged(pageable);
+        return jobService.getAllJobsPaged(pageable);
     }
 
     @PostMapping(
@@ -49,9 +49,9 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public TranscodeJob CreateNewJob(@RequestBody TranscodeJobCreation jobData) {
-        var preset = presetService.GetPreset(jobData.getPresetId());
+        var preset = presetService.getPreset(jobData.getPresetId());
         var job = new TranscodeJob(jobData.getInFile(), jobData.getOutFolder(), preset);
-        return jobService.InsertJob(job);
+        return jobService.insertJob(job);
     }
 
     @GetMapping(
@@ -60,7 +60,7 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob GetJob(@PathVariable Long id) {
-        return jobService.GetJob(id);
+        return jobService.getJob(id);
     }
 
     @PatchMapping(
@@ -70,7 +70,7 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob UpdateJob(@PathVariable Long id, TranscodeJobUpdate transcodeJobUpdate) {
-        return jobService.UpdateJob(transcodeJobUpdate, id);
+        return jobService.updateJob(transcodeJobUpdate, id);
     }
 
     @PutMapping(

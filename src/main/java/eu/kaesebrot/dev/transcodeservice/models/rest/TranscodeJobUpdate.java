@@ -35,7 +35,7 @@ public class TranscodeJobUpdate implements Serializable {
 
     public void setPreset(Optional<Long> presetId) {
         if (presetId.isPresent()) {
-            Preset = presetService.GetPresetOptional(presetId.get());
+            Preset = presetService.getPresetOptional(presetId.get());
         }
     }
 
@@ -43,7 +43,7 @@ public class TranscodeJobUpdate implements Serializable {
         InFile = inFile;
         OutFolder = outFolder;
         if (presetId.isPresent()) {
-            Preset = presetService.GetPresetOptional(presetId.get());
+            Preset = presetService.getPresetOptional(presetId.get());
         } else {
             Preset = Optional.empty();
         }

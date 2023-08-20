@@ -26,7 +26,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     }
 
     @Override
-    public TranscodeJob InsertJob(TranscodeJob transcodeJob) {
+    public TranscodeJob insertJob(TranscodeJob transcodeJob) {
         if (transcodeJob != null) {
             try {
                 jobLock.writeLock().lock();
@@ -44,14 +44,14 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     }
 
     @Override
-    public TranscodeJob UpdateJob(TranscodeJob transcodeJob) {
-        GetJob(transcodeJob.getId());
-        return InsertJob(transcodeJob);
+    public TranscodeJob updateJob(TranscodeJob transcodeJob) {
+        getJob(transcodeJob.getId());
+        return insertJob(transcodeJob);
     }
 
     @Override
-    public TranscodeJob UpdateJob(TranscodeJobUpdate updateData, Long jobId) {
-        var job = GetJob(jobId);
+    public TranscodeJob updateJob(TranscodeJobUpdate updateData, Long jobId) {
+        var job = getJob(jobId);
 
         if (updateData.getInFile().isPresent()) {
             job.setInFile(updateData.getInFile().get());
@@ -63,33 +63,33 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
             job.setPreset(updateData.getPreset().get());
         }
 
-        return UpdateJob(job);
+        return updateJob(job);
     }
 
     @Override
-    public Optional<TranscodeJob> GetJobOptional(Long id) {
+    public Optional<TranscodeJob> getJobOptional(Long id) {
         return repository
                 .findById(id);
     }
 
     @Override
-    public TranscodeJob GetJob(Long id) throws EntityNotFoundException {
-        return GetJobOptional(id)
+    public TranscodeJob getJob(Long id) throws EntityNotFoundException {
+        return getJobOptional(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("No TranscodeJob found by id={%s}", id)));
     }
 
     @Override
-    public Page<TranscodeJob> GetAllJobsPaged(Pageable pageable) {
+    public Page<TranscodeJob> getAllJobsPaged(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
     @Override
-    public void DeleteJobById(Long id) {
+    public void deleteJobById(Long id) {
         repository.deleteById(id);
     }
 
     @Override
-    public void DeleteByStatusList(List<ETranscodeServiceStatus> statusList) {
+    public void deleteByStatusList(List<ETranscodeServiceStatus> statusList) {
         repository.deleteAllByTranscodeStatusIn(statusList);
     }
 }

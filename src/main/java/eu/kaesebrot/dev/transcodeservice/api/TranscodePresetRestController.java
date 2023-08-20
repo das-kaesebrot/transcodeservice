@@ -23,6 +23,6 @@ public class TranscodePresetRestController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public TranscodePreset CreateNewPreset() {
-        return presetService.InsertPreset(new TranscodePreset());
+        return presetService.insertPreset(new TranscodePreset());
     }
 }

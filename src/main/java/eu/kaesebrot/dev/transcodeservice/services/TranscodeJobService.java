@@ -12,12 +12,12 @@ import java.util.Optional;
 
 public interface TranscodeJobService
 {
-    public Optional<TranscodeJob> GetJobOptional(Long id);
-    public TranscodeJob GetJob(Long id) throws EntityNotFoundException;
-    public Page<TranscodeJob> GetAllJobsPaged(Pageable pageable);
-    public TranscodeJob InsertJob(TranscodeJob transcodeJob);
-    public TranscodeJob UpdateJob(TranscodeJob transcodeJob);
-    public TranscodeJob UpdateJob(TranscodeJobUpdate updateData, Long jobId);
-    public void DeleteJobById(Long id);
-    public void DeleteByStatusList(List<ETranscodeServiceStatus> statusList);
+    public Optional<TranscodeJob> getJobOptional(Long id);
+    public TranscodeJob getJob(Long id) throws EntityNotFoundException;
+    public Page<TranscodeJob> getAllJobsPaged(Pageable pageable);
+    public TranscodeJob insertJob(TranscodeJob transcodeJob);
+    public TranscodeJob updateJob(TranscodeJob transcodeJob);
+    public TranscodeJob updateJob(TranscodeJobUpdate updateData, Long jobId);
+    public void deleteJobById(Long id);
+    public void deleteByStatusList(List<ETranscodeServiceStatus> statusList);
 }

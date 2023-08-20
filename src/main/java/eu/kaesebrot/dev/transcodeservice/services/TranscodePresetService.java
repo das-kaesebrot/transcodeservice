@@ -6,7 +6,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 public interface TranscodePresetService {
-    Optional<TranscodePreset> GetPresetOptional(Long id);
-    TranscodePreset GetPreset(Long id) throws EntityNotFoundException;
-    TranscodePreset InsertPreset(TranscodePreset preset);
+    Optional<TranscodePreset> getPresetOptional(Long id);
+    TranscodePreset getPreset(Long id) throws EntityNotFoundException;
+    TranscodePreset insertPreset(TranscodePreset preset);
 }

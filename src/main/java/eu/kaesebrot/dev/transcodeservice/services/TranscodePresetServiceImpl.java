@@ -21,19 +21,19 @@ public class TranscodePresetServiceImpl implements TranscodePresetService {
     }
 
     @Override
-    public Optional<TranscodePreset> GetPresetOptional(Long id) {
+    public Optional<TranscodePreset> getPresetOptional(Long id) {
         return repository
                 .findById(id);
     }
 
     @Override
-    public TranscodePreset GetPreset(Long id) throws EntityNotFoundException {
-        return GetPresetOptional(id)
+    public TranscodePreset getPreset(Long id) throws EntityNotFoundException {
+        return getPresetOptional(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("No TranscodePreset found by id={%s}", id)));
     }
 
     @Override
-    public TranscodePreset InsertPreset(TranscodePreset preset) {
+    public TranscodePreset insertPreset(TranscodePreset preset) {
         if (preset == null) {
             return null;
         }
@@ -45,6 +45,6 @@ public class TranscodePresetServiceImpl implements TranscodePresetService {
             presetLock.writeLock().unlock();
         }
 
-        return GetPreset(preset.getId());
+        return getPreset(preset.getId());
     }
 }
