@@ -1,5 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
+import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodeJobService;
@@ -10,8 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/transcodeservice")
@@ -72,5 +71,16 @@ public class TranscodeJobRestController {
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob UpdateJob(@PathVariable Long id, TranscodeJobUpdate transcodeJobUpdate) {
         return jobService.UpdateJob(transcodeJobUpdate, id);
+    }
+
+    @PutMapping(
+            value = "jobs/{id}/status",
+            consumes = { "application/json", "application/xml" },
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public TranscodeJob ChangeStatus(@PathVariable Long id, @RequestBody StatusPutRequest status) {
+        // TODO
+        return null;
     }
 }
