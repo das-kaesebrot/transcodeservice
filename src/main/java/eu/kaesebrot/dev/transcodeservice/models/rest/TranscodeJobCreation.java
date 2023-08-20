@@ -3,37 +3,37 @@ package eu.kaesebrot.dev.transcodeservice.models.rest;
 import java.io.Serializable;
 
 public class TranscodeJobCreation implements Serializable {
-    private String InFile;
-    private String OutFolder;
-    private Long PresetId;
+    private String inFile;
+    private String outFolder;
+    private Long presetId;
 
     public String getInFile() {
-        return InFile;
+        return inFile;
     }
 
     public void setInFile(String inFile) {
-        InFile = inFile;
+        this.inFile = inFile;
     }
 
     public String getOutFolder() {
-        return OutFolder;
+        return outFolder;
     }
 
     public void setOutFolder(String outFolder) {
-        OutFolder = outFolder;
+        this.outFolder = outFolder;
     }
 
     public Long getPresetId() {
-        return PresetId;
+        return presetId;
     }
 
     public void setPresetId(Long presetId) {
-        PresetId = presetId;
+        this.presetId = presetId;
     }
 
     public TranscodeJobCreation(String inFile, String outFolder, Long presetId) {
-        InFile = inFile;
-        OutFolder = outFolder;
-        PresetId = presetId;
+        this.inFile = inFile;
+        this.outFolder = outFolder;
+        this.presetId = presetId;
     }
 }
