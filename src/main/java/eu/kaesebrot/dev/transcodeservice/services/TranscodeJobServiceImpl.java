@@ -14,13 +14,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
-public class TranscodeJobService implements ITranscodeJobService
+public class TranscodeJobServiceImpl implements ITranscodeJobService
 {
     private final ITranscodeJobRepository repository;
 
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobService(ITranscodeJobRepository repository) {
+    public TranscodeJobServiceImpl(ITranscodeJobRepository repository) {
         jobLock = new ReentrantReadWriteLock();
         this.repository = repository;
     }
