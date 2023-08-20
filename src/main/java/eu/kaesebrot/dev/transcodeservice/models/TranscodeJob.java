@@ -14,110 +14,110 @@ import java.sql.Timestamp;
 public class TranscodeJob implements Serializable {
     @javax.persistence.Version
     @Column(name = "version")
-    private long Version;
+    private long version;
 
     @Id
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
-    private Long Id;
+    private Long id;
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "in_file", nullable = false)
-    private String InFile;
+    private String inFile;
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "out_folder", nullable = false)
-    private String OutFolder;
+    private String outFolder;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private Timestamp CreatedAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
-    private Timestamp ModifiedAt;
+    private Timestamp modifiedAt;
 
     @ManyToOne
     @JoinColumn(name = "preset_id")
-    private TranscodePreset Preset;
+    private TranscodePreset preset;
 
-    private ETranscodeServiceStatus TranscodeStatus;
+    private ETranscodeServiceStatus status;
 
     public long getVersion() {
-        return Version;
+        return version;
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public Timestamp getCreatedAt() {
-        return CreatedAt;
+        return createdAt;
     }
 
     public Timestamp getModifiedAt() {
-        return ModifiedAt;
+        return modifiedAt;
     }
 
-    public ETranscodeServiceStatus getTranscodeStatus() {
-        return TranscodeStatus;
+    public ETranscodeServiceStatus getStatus() {
+        return status;
     }
 
     @Override
     public String toString() {
         return "TranscodeJob{" +
-                "Version=" + Version +
-                ", Id=" + Id +
-                ", InFile='" + InFile + '\'' +
-                ", OutFolder='" + OutFolder + '\'' +
-                ", CreatedAt=" + CreatedAt +
-                ", ModifiedAt=" + ModifiedAt +
-                ", Preset=" + Preset +
-                ", Status=" + TranscodeStatus +
+                "Version=" + version +
+                ", Id=" + id +
+                ", InFile='" + inFile + '\'' +
+                ", OutFolder='" + outFolder + '\'' +
+                ", CreatedAt=" + createdAt +
+                ", ModifiedAt=" + modifiedAt +
+                ", Preset=" + preset +
+                ", Status=" + status +
                 '}';
     }
 
     public String getInFile() {
-        return InFile;
+        return inFile;
     }
 
     public void setInFile(String inFile) {
-        InFile = inFile;
+        this.inFile = inFile;
     }
 
     public String getOutFolder() {
-        return OutFolder;
+        return outFolder;
     }
 
     public void setOutFolder(String outFolder) {
-        OutFolder = outFolder;
+        this.outFolder = outFolder;
     }
 
     public TranscodePreset getPreset() {
-        return Preset;
+        return preset;
     }
 
     public void setPreset(TranscodePreset preset) {
-        Preset = preset;
+        this.preset = preset;
     }
 
-    public void setTranscodeStatus(ETranscodeServiceStatus status) {
-        if (status.ordinal() < TranscodeStatus.ordinal()) {
+    public void setStatus(ETranscodeServiceStatus status) {
+        if (status.ordinal() < status.ordinal()) {
             throw new IllegalArgumentException("Status can't be set to a lower value!");
         }
 
-        TranscodeStatus = status;
+        status = status;
     }
 
     public TranscodeJob(
             String inFile,
             String outFolder,
             TranscodePreset preset) {
-        InFile = inFile;
-        OutFolder = outFolder;
-        Preset = preset;
+        this.inFile = inFile;
+        this.outFolder = outFolder;
+        this.preset = preset;
 
-        TranscodeStatus = ETranscodeServiceStatus.CREATED;
+        status = ETranscodeServiceStatus.CREATED;
     }
 
     public TranscodeJob() {

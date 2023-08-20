@@ -92,6 +92,6 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 
     @Override
     public void deleteByStatusList(List<ETranscodeServiceStatus> statusList) {
-        jobRepository.deleteAllByTranscodeStatusIn(statusList);
+        jobRepository.deleteAllByStatusIn(statusList);
     }
 }

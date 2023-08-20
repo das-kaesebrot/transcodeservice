@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 @Repository
 public interface ITranscodeJobRepository extends JpaRepository<TranscodeJob, Long> {
-    void deleteAllByTranscodeStatus(ETranscodeServiceStatus transcodeStatus);
-    void deleteAllByTranscodeStatusIn(List<ETranscodeServiceStatus> transcodeServiceStatuses);
-    Stream<TranscodeJob> getByTranscodeStatusIn(List<ETranscodeServiceStatus> transcodeStatuses);
+    void deleteAllByStatus(ETranscodeServiceStatus transcodeStatus);
+    void deleteAllByStatusIn(List<ETranscodeServiceStatus> transcodeServiceStatuses);
+    Stream<TranscodeJob> getByStatusIn(List<ETranscodeServiceStatus> transcodeStatuses);
     Stream<TranscodeJob> getByPreset(TranscodePreset preset);
-    long countByTranscodeStatus(ETranscodeServiceStatus status);
+    long countByStatus(ETranscodeServiceStatus status);
     void deleteById(Long id);
 }

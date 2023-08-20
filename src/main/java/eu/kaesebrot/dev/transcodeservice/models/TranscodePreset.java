@@ -15,38 +15,38 @@ public class TranscodePreset implements Serializable {
 
     @javax.persistence.Version
     @Column(name = "version")
-    private long Version;
+    private long version;
 
     @javax.persistence.Id
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
-    private Long Id;
+    private Long id;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private Timestamp CreatedAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
-    private Timestamp ModifiedAt;
+    private Timestamp modifiedAt;
 
-    @OneToMany(mappedBy = "Preset")
-    private Set<TranscodeJob> Jobs;
+    @OneToMany(mappedBy = "preset")
+    private Set<TranscodeJob> jobs;
 
     public Timestamp getCreatedAt() {
-        return CreatedAt;
+        return createdAt;
     }
 
     public Timestamp getModifiedAt() {
-        return ModifiedAt;
+        return modifiedAt;
     }
 
     public long getVersion() {
-        return Version;
+        return version;
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     /*
