@@ -1,5 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "transcode_job")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TranscodeJob implements Serializable {
     @javax.persistence.Version
     @Column(name = "version")
