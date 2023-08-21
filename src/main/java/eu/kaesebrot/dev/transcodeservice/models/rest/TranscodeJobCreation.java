@@ -2,13 +2,17 @@ package eu.kaesebrot.dev.transcodeservice.models.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class TranscodeJobCreation implements Serializable {
+    @NotNull
     @JsonProperty("in_file")
     private String inFile;
+    @NotNull
     @JsonProperty("out_folder")
     private String outFolder;
+    @NotNull
     @JsonProperty("preset_id")
     private Long presetId;
 
