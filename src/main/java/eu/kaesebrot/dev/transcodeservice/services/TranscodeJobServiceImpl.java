@@ -3,6 +3,7 @@ package eu.kaesebrot.dev.transcodeservice.services;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,14 +56,14 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     public TranscodeJob updateJob(TranscodeJobUpdate updateData, Long jobId) {
         var job = getJob(jobId);
 
-        if (updateData.getInFile().isPresent()) {
-            job.setInFile(updateData.getInFile().get());
+        if (!StringUtils.isBlank(updateData.getInFile())) {
+            job.setInFile(updateData.getInFile());
         }
-        if (updateData.getOutFolder().isPresent()) {
-            job.setOutFolder(updateData.getOutFolder().get());
+        if (!StringUtils.isBlank(updateData.getOutFolder())) {
+            job.setOutFolder(updateData.getOutFolder());
         }
-        if (updateData.getPresetId().isPresent()) {
-            job.setPreset(presetRepository.findById(updateData.getPresetId().get()).get());
+        if (updateData.getPresetId() != null) {
+            job.setPreset(presetRepository.findById(updateData.getPresetId()).get());
         }
 
         return updateJob(job);
