@@ -1,8 +1,8 @@
 package eu.kaesebrot.dev.transcodeservice.models.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class TranscodeJobCreation implements Serializable {

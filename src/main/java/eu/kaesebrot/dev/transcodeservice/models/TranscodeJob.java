@@ -2,11 +2,11 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 @Table(name = "transcode_job")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TranscodeJob implements Serializable {
-    @javax.persistence.Version
+    @Version
     @Column(name = "version")
     private long version;
 

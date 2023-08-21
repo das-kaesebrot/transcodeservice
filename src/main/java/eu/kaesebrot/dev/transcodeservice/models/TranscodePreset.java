@@ -2,10 +2,10 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -95,7 +95,18 @@ public class TranscodePreset implements Serializable {
     public void setTrackPresets(Set<TrackPreset> trackPresets) {
         this.trackPresets = trackPresets;
     }
-/*
+
+    public TranscodePreset() {
+
+    }
+
+    public TranscodePreset(String description, String muxer, Set<TrackPreset> trackPresets) {
+        this.description = description;
+        this.muxer = muxer;
+        this.trackPresets = trackPresets;
+    }
+
+    /*
     * TODO
     # for usage with x264/x265
     profile = Column(String)
