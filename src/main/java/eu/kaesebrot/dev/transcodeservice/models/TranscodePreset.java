@@ -1,5 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,19 +16,23 @@ public class TranscodePreset implements Serializable {
 
     @javax.persistence.Version
     @Column(name = "version")
+    @JsonProperty("version")
     private long version;
 
     @javax.persistence.Id
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
+    @JsonProperty("id")
     private Long id;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
+    @JsonProperty("created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
+    @JsonProperty("modified_at")
     private Timestamp modifiedAt;
 
     @OneToMany(mappedBy = "preset")
