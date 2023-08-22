@@ -44,24 +44,25 @@ public class FFmpegRunnable implements Runnable {
                     .filter(t -> t.getType().equals(ETrackPresetType.VIDEO))
                     .findFirst().orElseThrow();
 
-            VideoFormat previousVideoFormat = videoStream.getFormat();
+            VideoFormat inputFormat = videoStream.getFormat();
 
-            int width = previousVideoFormat.getWidth();
-            int height = previousVideoFormat.getHeight();
-            double frame_rate = previousVideoFormat.getFramesPerSecond();
+            int width = inputFormat.getWidth();
+            int height = inputFormat.getHeight();
+            double frame_rate = inputFormat.getFramesPerSecond();
 
-            if (videoPreset.getWidth() != null && videoPreset.getWidth().intValue() != previousVideoFormat.getWidth()) {
+            if (videoPreset.getWidth() != null && videoPreset.getWidth().intValue() != inputFormat.getWidth()) {
                 width = videoPreset.getWidth().intValue();
             }
-            if (videoPreset.getHeight() != null && videoPreset.getHeight().intValue() != previousVideoFormat.getHeight()) {
+            if (videoPreset.getHeight() != null && videoPreset.getHeight().intValue() != inputFormat.getHeight()) {
                 height = videoPreset.getHeight().intValue();
             }
-            if (videoPreset.getFramerate() != null && (1D / videoPreset.getFramerate()) != previousVideoFormat.getFramesPerSecond()) {
+            if (videoPreset.getFramerate() != null && (1D / videoPreset.getFramerate()) != inputFormat.getFramesPerSecond()) {
                 frame_rate = 1D / videoPreset.getFramerate();
             }
 
-            // TODO implement pix_fmt, gamut, target color space
-            target.registerVideoSubstream(videoPreset.getVideoCodecName(), new VideoFormat(width, height, frame_rate), new HashMap<>());
+            // TODO implement gamut, target color space
+            target.registerVideoSubstream(videoPreset.getVideoCodecName(), width, height, frame_rate, new HashMap<>());
+            // target.setPixelFormat(avutil.AV_PIX_FMT_RGB24);
 
             // TODO implement processing for audio tracks
             sourceStream = source;
