@@ -57,13 +57,13 @@ public class FFmpegRunnable implements Runnable {
             int height = inputFormat.getHeight();
             double frame_rate = inputFormat.getFramesPerSecond();
 
-            if (videoPreset.getWidth() != null && videoPreset.getWidth().intValue() != inputFormat.getWidth()) {
-                width = videoPreset.getWidth().intValue();
+            if (videoPreset.getWidth() != null && videoPreset.getWidth() != width) {
+                width = videoPreset.getWidth();
             }
-            if (videoPreset.getHeight() != null && videoPreset.getHeight().intValue() != inputFormat.getHeight()) {
-                height = videoPreset.getHeight().intValue();
+            if (videoPreset.getHeight() != null && videoPreset.getHeight() != height) {
+                height = videoPreset.getHeight();
             }
-            if (videoPreset.getFramerate() != null && (1D / videoPreset.getFramerate()) != inputFormat.getFramesPerSecond()) {
+            if (videoPreset.getFramerate() != null && (1D / videoPreset.getFramerate()) != frame_rate) {
                 frame_rate = 1D / videoPreset.getFramerate();
             }
 
