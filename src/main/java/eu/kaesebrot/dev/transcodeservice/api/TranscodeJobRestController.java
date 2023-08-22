@@ -1,6 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
 import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
+import eu.kaesebrot.dev.transcodeservice.models.rest.PingResponse;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
@@ -29,8 +30,8 @@ public class TranscodeJobRestController {
             value = "ping",
             produces = { "application/json", "application/xml" }
     )
-    public String Ping() {
-        return "pong";
+    public PingResponse Ping() {
+        return new PingResponse();
     }
 
     @GetMapping(
