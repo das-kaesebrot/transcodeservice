@@ -12,7 +12,7 @@ public class AudioTrackPreset extends TrackPreset {
     private String audioBitrate;
     @Nullable
     @JsonProperty("audio_sample_rate")
-    private Long audioSampleRate;
+    private Integer audioSampleRate;
 
     public String getAudioCodecName() {
         return audioCodecName;
@@ -32,11 +32,11 @@ public class AudioTrackPreset extends TrackPreset {
     }
 
     @Nullable
-    public Long getAudioSampleRate() {
+    public Integer getAudioSampleRate() {
         return audioSampleRate;
     }
 
-    public void setAudioSampleRate(@Nullable Long audioSampleRate) {
+    public void setAudioSampleRate(@Nullable Integer audioSampleRate) {
         this.audioSampleRate = audioSampleRate;
     }
 
