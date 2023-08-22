@@ -7,10 +7,12 @@ import com.github.manevolent.ffmpeg4j.stream.output.FFmpegTargetStream;
 import com.github.manevolent.ffmpeg4j.stream.source.FFmpegSourceStream;
 import com.github.manevolent.ffmpeg4j.transcoder.Transcoder;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
+import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.AudioTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.VideoTrackPreset;
+import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 
 import java.io.File;
@@ -20,9 +22,11 @@ public class FFmpegRunnable implements Runnable {
     private final TranscodeJob job;
     private FFmpegSourceStream sourceStream;
     private FFmpegTargetStream targetStream;
+    private TranscodeJobService jobService;
 
-    public FFmpegRunnable(TranscodeJob job) {
+    public FFmpegRunnable(TranscodeJob job, TranscodeJobService jobService) {
         this.job = job;
+        this.jobService = jobService;
 
         bootstrap();
     }
@@ -93,7 +97,9 @@ public class FFmpegRunnable implements Runnable {
             sourceStream = source;
             targetStream = target;
 
+            jobService.setJobStatus(job, ETranscodeServiceStatus.CREATED);
         } catch (Exception e) {
+            jobService.setJobStatus(job, ETranscodeServiceStatus.FAILED);
             throw new RuntimeException(e);
         }
     }
@@ -101,8 +107,11 @@ public class FFmpegRunnable implements Runnable {
     @Override
     public void run() {
         try {
+            jobService.setJobStatus(job, ETranscodeServiceStatus.RUNNING);
             Transcoder.convert(sourceStream, targetStream, Double.MAX_VALUE);
+            jobService.setJobStatus(job, ETranscodeServiceStatus.SUCCESS);
         } catch (Exception e) {
+            jobService.setJobStatus(job, ETranscodeServiceStatus.FAILED);
             throw new RuntimeException(e);
         }
     }
