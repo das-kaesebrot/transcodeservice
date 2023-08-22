@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static eu.kaesebrot.dev.transcodeservice.ffmpeg.AVUtils.iterateCodecs;
-import static eu.kaesebrot.dev.transcodeservice.ffmpeg.AVUtils.iterateMuxers;
+import static eu.kaesebrot.dev.transcodeservice.utils.AVUtils.iterateCodecs;
+import static eu.kaesebrot.dev.transcodeservice.utils.AVUtils.iterateMuxers;
 import static org.bytedeco.ffmpeg.avcodec.AVCodecContext.FF_COMPLIANCE_STRICT;
 import static org.bytedeco.ffmpeg.global.avcodec.av_codec_is_decoder;
 import static org.bytedeco.ffmpeg.global.avcodec.av_codec_is_encoder;

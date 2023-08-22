@@ -11,6 +11,7 @@ import eu.kaesebrot.dev.transcodeservice.models.AudioTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.VideoTrackPreset;
+import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 
 import java.io.File;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package eu.kaesebrot.dev.transcodeservice.ffmpeg;
+package eu.kaesebrot.dev.transcodeservice.utils;
 
 import org.bytedeco.ffmpeg.avcodec.AVCodec;
 import org.bytedeco.ffmpeg.avformat.AVFormatContext;
@@ -38,10 +38,6 @@ public final class AVUtils {
         }
     }
 
-    /**
-     * See: https://ffmpeg.org/pipermail/libav-user/2018-May/011160.html
-     * @return
-     */
     public static <T extends Pointer> Collection<T> iterate(Function<Pointer, T> iterateFunction) {
         Collection<T> outs = new ArrayList<>();
         try (Pointer opaque = new Pointer()) {
