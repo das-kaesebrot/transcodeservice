@@ -1,6 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
 import org.springframework.lang.Nullable;
 
 public class AudioTrackPreset extends TrackPreset {
@@ -37,5 +38,10 @@ public class AudioTrackPreset extends TrackPreset {
 
     public void setAudioSampleRate(@Nullable Long audioSampleRate) {
         this.audioSampleRate = audioSampleRate;
+    }
+
+    @Override
+    public ETrackPresetType getType() {
+        return ETrackPresetType.AUDIO;
     }
 }

@@ -1,6 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
 import org.springframework.lang.Nullable;
 
 public class VideoTrackPreset extends TrackPreset {
@@ -75,5 +76,8 @@ public class VideoTrackPreset extends TrackPreset {
 
     public void setVideoPixelFormat(@Nullable String videoPixelFormat) {
         this.videoPixelFormat = videoPixelFormat;
+    }
+    public ETrackPresetType getType() {
+        return ETrackPresetType.VIDEO;
     }
 }
