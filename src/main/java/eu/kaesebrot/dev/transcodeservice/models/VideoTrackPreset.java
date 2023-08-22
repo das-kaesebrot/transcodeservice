@@ -2,20 +2,26 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
 public class VideoTrackPreset extends TrackPreset {
+    @NotBlank
     @JsonProperty("video_codec")
     private String videoCodecName;
 
     // nullable for carrying over from input
     @Nullable
+    @Positive
     private Double framerate;
     // nullable for carrying over from input
     @Nullable
+    @Positive
     private Integer width;
     // nullable for carrying over from input
     @Nullable
+    @Positive
     private Integer height;
     @Nullable
     @JsonProperty("video_bitrate")

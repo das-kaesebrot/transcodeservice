@@ -2,6 +2,7 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
+import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
 public class AudioTrackPreset extends TrackPreset {
@@ -12,6 +13,7 @@ public class AudioTrackPreset extends TrackPreset {
     private String audioBitrate;
     @Nullable
     @JsonProperty("audio_sample_rate")
+    @Positive
     private Integer audioSampleRate;
 
     public String getAudioCodecName() {
