@@ -13,10 +13,10 @@ public class VideoTrackPreset extends TrackPreset {
     private Double framerate;
     // nullable for carrying over from input
     @Nullable
-    private Long width;
+    private Integer width;
     // nullable for carrying over from input
     @Nullable
-    private Long height;
+    private Integer height;
     @Nullable
     @JsonProperty("video_bitrate")
     private String videoBitrate;
@@ -43,20 +43,20 @@ public class VideoTrackPreset extends TrackPreset {
     }
 
     @Nullable
-    public Long getWidth() {
+    public Integer getWidth() {
         return width;
     }
 
-    public void setWidth(@Nullable Long width) {
+    public void setWidth(@Nullable Integer width) {
         this.width = width;
     }
 
     @Nullable
-    public Long getHeight() {
+    public Integer getHeight() {
         return height;
     }
 
-    public void setHeight(@Nullable Long height) {
+    public void setHeight(@Nullable Integer height) {
         this.height = height;
     }
 
