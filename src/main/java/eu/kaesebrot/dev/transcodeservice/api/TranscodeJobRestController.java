@@ -81,8 +81,14 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob ChangeStatus(@PathVariable Long id, @RequestBody StatusPutRequest status) {
-        // TODO
-        return null;
+        if (status.equals(StatusPutRequest.START)) {
+            jobService.enqueueJob(id);
+        }
+        else if (status.equals(StatusPutRequest.ABORT)) {
+            throw new UnsupportedOperationException("Not supported yet");
+        }
+
+        return jobService.getJob(id);
     }
 
     @GetMapping(
