@@ -68,7 +68,9 @@ public class FFmpegRunnable implements Runnable {
             }
 
             // TODO implement gamut, target color space
-            target.registerVideoSubstream(videoPreset.getVideoCodecName(), width, height, frame_rate, new HashMap<>());
+            var videoOpts = new HashMap<String, String>();
+
+            target.registerVideoSubstream(videoPreset.getVideoCodecName(), width, height, frame_rate, videoOpts);
             // target.setPixelFormat(avutil.AV_PIX_FMT_RGB24);
 
             for (AudioSourceSubstream audioSubstream : source.getSubstreams().stream()
