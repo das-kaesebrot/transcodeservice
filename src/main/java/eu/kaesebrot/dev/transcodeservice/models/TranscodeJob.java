@@ -1,13 +1,20 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.manevolent.ffmpeg4j.FFmpeg;
+import com.github.manevolent.ffmpeg4j.FFmpegException;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 
 @Entity
@@ -89,6 +96,32 @@ public class TranscodeJob implements Serializable {
 
     public String getOutFolder() {
         return outFolder;
+    }
+
+    public Path getOutFileName() {
+        if (StringUtils.isBlank(inFile))
+            return null;
+
+        if (preset == null)
+            return null;
+
+        var file = new File(inFile);
+
+        String fileName = FilenameUtils.removeExtension(file.getName());
+        String ext = "invalid";
+
+        try {
+            ext = FFmpeg
+                    .getOutputFormatByName(getPreset().getMuxer())
+                    .extensions()
+                    .getString()
+                    .split(",")[0];
+
+        } catch (FFmpegException e) {
+            throw new RuntimeException("Error while getting output format!", e);
+        }
+
+        return Paths.get(outFolder, fileName + ext);
     }
 
     public void setOutFolder(String outFolder) {
