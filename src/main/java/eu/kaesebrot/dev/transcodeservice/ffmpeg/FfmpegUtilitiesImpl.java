@@ -3,19 +3,13 @@ package eu.kaesebrot.dev.transcodeservice.ffmpeg;
 import com.github.manevolent.ffmpeg4j.FFmpeg;
 import com.github.manevolent.ffmpeg4j.FFmpegException;
 import org.bytedeco.ffmpeg.avcodec.AVCodec;
-import org.bytedeco.ffmpeg.avformat.AVInputFormat;
 import org.bytedeco.ffmpeg.avformat.AVOutputFormat;
-import org.bytedeco.ffmpeg.global.avcodec;
-import org.bytedeco.ffmpeg.global.avformat;
-import org.bytedeco.javacpp.Pointer;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
+import static eu.kaesebrot.dev.transcodeservice.ffmpeg.AVUtils.iterateCodecs;
+import static eu.kaesebrot.dev.transcodeservice.ffmpeg.AVUtils.iterateMuxers;
 import static org.bytedeco.ffmpeg.avcodec.AVCodecContext.FF_COMPLIANCE_STRICT;
 import static org.bytedeco.ffmpeg.global.avcodec.av_codec_is_decoder;
 import static org.bytedeco.ffmpeg.global.avcodec.av_codec_is_encoder;
@@ -97,33 +91,5 @@ public class FfmpegUtilitiesImpl implements FfmpegUtilities {
     public boolean muxerSupportsCodec(AVOutputFormat muxer, String codecName) throws FFmpegException {
         AVCodec codec = FFmpeg.getCodecByName(codecName);
         return avformat_query_codec(muxer, codec.id(), FF_COMPLIANCE_STRICT) != 0;
-    }
-
-
-    /**
-     * See: https://ffmpeg.org/pipermail/libav-user/2018-May/011160.html
-     * @return
-     */
-    private static <T extends Pointer> Collection<T> iterate(Function<Pointer, T> iterateFunction) {
-        Collection<T> outs = new ArrayList<>();
-        try (Pointer opaque = new Pointer()) {
-            T out;
-            while ((out = iterateFunction.apply(opaque)) != null) {
-                outs.add(out);
-            }
-        }
-        return Collections.unmodifiableCollection(outs);
-    }
-
-    private static Collection<AVOutputFormat> iterateMuxers() {
-        return iterate(avformat::av_muxer_iterate);
-    }
-
-    private static Collection<AVInputFormat> iterateDemuxers() {
-        return iterate(avformat::av_demuxer_iterate);
-    }
-
-    private static Collection<AVCodec> iterateCodecs() {
-        return iterate(avcodec::av_codec_iterate);
     }
 }
