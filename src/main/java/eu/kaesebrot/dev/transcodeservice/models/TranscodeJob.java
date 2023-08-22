@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.manevolent.ffmpeg4j.FFmpeg;
 import com.github.manevolent.ffmpeg4j.FFmpegException;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
+import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -99,7 +98,7 @@ public class TranscodeJob implements Serializable {
     }
 
     public Path getOutFileName() {
-        if (StringUtils.isBlank(inFile))
+        if (StringUtils.isNullOrEmpty(inFile))
             return null;
 
         if (preset == null)
@@ -107,7 +106,7 @@ public class TranscodeJob implements Serializable {
 
         var file = new File(inFile);
 
-        String fileName = FilenameUtils.removeExtension(file.getName());
+        String fileName = StringUtils.getFilenameWithoutExtension(file.getName());
         String ext = "invalid";
 
         try {

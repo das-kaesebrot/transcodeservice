@@ -24,8 +24,6 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.5'
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.2.7.Final'
-    implementation 'org.apache.commons:commons-lang3:3.13.0'
-    implementation 'commons-io:commons-io:2.13.0'
     implementation 'com.github.manevolent:ffmpeg4j:-SNAPSHOT'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
