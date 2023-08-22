@@ -2,6 +2,7 @@ package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -33,18 +34,7 @@ public class TranscodePresetServiceImpl implements TranscodePresetService {
     }
 
     @Override
-    public TranscodePreset insertPreset(TranscodePreset preset) {
-        if (preset == null) {
-            return null;
-        }
-
-        try {
-            presetLock.writeLock().lock();
-            repository.saveAndFlush(preset);
-        } finally {
-            presetLock.writeLock().unlock();
-        }
-
-        return getPreset(preset.getId());
+    public TranscodePreset insertPreset(@NotNull TranscodePreset preset) {
+        return repository.saveAndFlush(preset);
     }
 }
