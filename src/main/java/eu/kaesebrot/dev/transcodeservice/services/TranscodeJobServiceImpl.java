@@ -1,9 +1,12 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobExecutor;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegRunnable;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +22,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 {
     private final ITranscodeJobRepository jobRepository;
     private final ITranscodePresetRepository presetRepository;
-
+    private final FFmpegJobExecutor jobExecutor = new FFmpegJobExecutor();
     private final ReadWriteLock jobLock;
 
     public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository) {
@@ -67,6 +70,29 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
         }
 
         return updateJob(job);
+    }
+
+    @Override
+    public void setJobStatus(@NotNull TranscodeJob job, ETranscodeServiceStatus status) {
+        try {
+            jobLock.writeLock().lock();
+
+            job.setStatus(status);
+            jobRepository.saveAndFlush(job);
+
+        } finally {
+            jobLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void enqueueJob(Long jobId) {
+        enqueueJob(getJob(jobId));
+    }
+
+    @Override
+    public void enqueueJob(TranscodeJob job) {
+        jobExecutor.execute(new FFmpegRunnable(job, this));
     }
 
     @Override
