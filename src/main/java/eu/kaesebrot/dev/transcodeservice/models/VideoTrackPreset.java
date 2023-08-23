@@ -36,6 +36,15 @@ public class VideoTrackPreset extends TrackPreset {
     }
 
     public void setVideoCodecName(String videoCodecName) {
+        if (StringUtils.isNullOrEmpty(videoCodecName)) {
+            this.videoCodecName = "copy"; // TODO check this
+            return;
+        }
+
+        if (!AVUtils.getSupportedVideoEncoders().contains(videoCodecName)) {
+            throw new IllegalArgumentException(String.format("Given codec '%s' is not supported!", videoCodecName));
+        }
+
         this.videoCodecName = videoCodecName;
     }
 
