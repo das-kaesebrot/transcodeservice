@@ -90,6 +90,15 @@ public class VideoTrackPreset extends TrackPreset {
     }
 
     public void setVideoPixelFormat(@Nullable String videoPixelFormat) {
+        if (videoCodecName == null) {
+            // TODO maybe throw later in case this preset only copies
+            return;
+        }
+
+        if (!AVUtils.getSupportedPixelFormatNames(videoCodecName).contains(videoPixelFormat)) {
+            throw new IllegalArgumentException(String.format("Given pixel format '%s' is not supported by codec '%s'!", videoPixelFormat, videoCodecName));
+        }
+
         this.videoPixelFormat = videoPixelFormat;
     }
     public ETrackPresetType getType() {
