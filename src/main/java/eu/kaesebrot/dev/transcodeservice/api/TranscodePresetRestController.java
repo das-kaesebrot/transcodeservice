@@ -1,9 +1,9 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FfmpegUtilities;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.rest.SupportedFormats;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
+import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "preset", description = "The TranscodePreset API")
 public class TranscodePresetRestController {
     private final TranscodePresetService presetService;
-    private final FfmpegUtilities ffmpegUtilities;
 
-    public TranscodePresetRestController(TranscodePresetService presetService, FfmpegUtilities ffmpegUtilities) {
+    public TranscodePresetRestController(TranscodePresetService presetService) {
         this.presetService = presetService;
-        this.ffmpegUtilities = ffmpegUtilities;
     }
 
     @PostMapping(
@@ -38,9 +36,9 @@ public class TranscodePresetRestController {
     public SupportedFormats GetSupportedFormates() {
         var supportedFormats = new SupportedFormats();
 
-        supportedFormats.setSupportedVideoEncoders(ffmpegUtilities.getSupportedVideoEncoders());
-        supportedFormats.setSupportedAudioEncoders(ffmpegUtilities.getSupportedAudioEncoders());
-        supportedFormats.setSupportedMuxerNames(ffmpegUtilities.getSupportedMuxers().stream().map(m -> m.name().getString()).toList());
+        supportedFormats.setSupportedVideoEncoders(AVUtils.getSupportedVideoEncoders());
+        supportedFormats.setSupportedAudioEncoders(AVUtils.getSupportedAudioEncoders());
+        supportedFormats.setSupportedMuxerNames(AVUtils.getSupportedMuxers().stream().map(m -> m.name().getString()).toList());
 
         return supportedFormats;
     }
