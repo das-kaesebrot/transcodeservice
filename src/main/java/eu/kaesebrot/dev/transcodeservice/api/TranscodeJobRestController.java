@@ -1,6 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
 import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
+import eu.kaesebrot.dev.transcodeservice.models.rest.PingResponse;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
@@ -29,8 +30,8 @@ public class TranscodeJobRestController {
             value = "ping",
             produces = { "application/json", "application/xml" }
     )
-    public String Ping() {
-        return "pong";
+    public PingResponse Ping() {
+        return new PingResponse();
     }
 
     @GetMapping(
@@ -80,7 +81,22 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob ChangeStatus(@PathVariable Long id, @RequestBody StatusPutRequest status) {
-        // TODO
-        return null;
+        if (status.equals(StatusPutRequest.START)) {
+            jobService.enqueueJob(id);
+        }
+        else if (status.equals(StatusPutRequest.ABORT)) {
+            throw new UnsupportedOperationException("Not supported yet");
+        }
+
+        return jobService.getJob(id);
+    }
+
+    @GetMapping(
+            value = "jobs/{id}/status",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public String GetStatus(@PathVariable Long id) {
+        return jobService.getJob(id).getStatus().name();
     }
 }

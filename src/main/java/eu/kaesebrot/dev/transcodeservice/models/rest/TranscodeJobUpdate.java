@@ -1,38 +1,41 @@
 package eu.kaesebrot.dev.transcodeservice.models.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
-import java.util.Optional;
 
 public class TranscodeJobUpdate implements Serializable {
-    private Optional<String> inFile;
+    @JsonProperty("in_file")
+    private String inFile;
+    @JsonProperty("out_folder")
+    private String outFolder;
+    @JsonProperty("preset_id")
+    private Long presetId;
 
-    private Optional<String> outFolder;
-    private Optional<Long> presetId;
-
-    public Optional<String> getInFile() {
+    public String getInFile() {
         return inFile;
     }
 
-    public void setInFile(Optional<String> inFile) {
+    public void setInFile(String inFile) {
         this.inFile = inFile;
     }
-    public Optional<String> getOutFolder() {
+    public String getOutFolder() {
         return outFolder;
     }
 
-    public void setOutFolder(Optional<String> outFolder) {
+    public void setOutFolder(String outFolder) {
         this.outFolder = outFolder;
     }
 
-    public Optional<Long> getPresetId() {
+    public Long getPresetId() {
         return presetId;
     }
 
-    public void setPresetId(Optional<Long> presetId) {
-
+    public void setPresetId(Long presetId) {
+        this.presetId = presetId;
     }
 
-    public TranscodeJobUpdate(Optional<String> inFile, Optional<String> outFolder, Optional<Long> presetId) {
+    public TranscodeJobUpdate(String inFile, String outFolder, Long presetId) {
         this.inFile = inFile;
         this.outFolder = outFolder;
         this.presetId = presetId;

@@ -1,37 +1,53 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
-// TODO
 @Entity
 @Table(name = "transcode_preset")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TranscodePreset implements Serializable {
 
-    @javax.persistence.Version
+    @Version
     @Column(name = "version")
+    @JsonProperty("version")
     private long version;
 
-    @javax.persistence.Id
+    @Id
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
+    @JsonProperty("id")
     private Long id;
+
+    private String description;
+
+    @JsonProperty("container")
+    private String muxer;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
+    @JsonProperty("created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
+    @JsonProperty("modified_at")
     private Timestamp modifiedAt;
 
     @OneToMany(mappedBy = "preset")
     private Set<TranscodeJob> jobs;
+
+    @ElementCollection
+    @JsonProperty("track_presets")
+    private Set<TrackPreset> trackPresets = new HashSet<>();
 
     public Timestamp getCreatedAt() {
         return createdAt;
@@ -49,21 +65,49 @@ public class TranscodePreset implements Serializable {
         return id;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getMuxer() {
+        return muxer;
+    }
+
+    public void setMuxer(String muxer) {
+        this.muxer = muxer;
+    }
+
+    public Set<TranscodeJob> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(Set<TranscodeJob> jobs) {
+        this.jobs = jobs;
+    }
+
+    public Set<TrackPreset> getTrackPresets() {
+        return trackPresets;
+    }
+
+    public void setTrackPresets(Set<TrackPreset> trackPresets) {
+        this.trackPresets = trackPresets;
+    }
+
+    public TranscodePreset() {
+
+    }
+
+    public TranscodePreset(String description, String muxer, Set<TrackPreset> trackPresets) {
+        this.description = description;
+        this.muxer = muxer;
+        this.trackPresets = trackPresets;
+    }
+
     /*
     * TODO
-    description = Column(String)
-
-    vcodec = Column(String)
-    acodec = Column(String)
-    vbitrate = Column(BigInteger)
-    abitrate = Column(BigInteger)
-    format = Column(String(32))
-
-    width = Column(Integer)
-    height = Column(Integer)
-    framerate = Column(Float)
-    audiorate = Column(BigInteger)
-
     # for usage with x264/x265
     profile = Column(String)
     tune = Column(String)
@@ -71,10 +115,6 @@ public class TranscodePreset implements Serializable {
 
     videofilter = Column(String)
     audiofilter = Column(String)
-
-    pix_fmt = Column(String)
-
-    jobs = relationship("TranscodeJob", back_populates="preset")
     */
 
 }

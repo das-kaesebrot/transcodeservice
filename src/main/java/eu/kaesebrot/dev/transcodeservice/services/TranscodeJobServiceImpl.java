@@ -1,13 +1,17 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegCallable;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -18,13 +22,14 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 {
     private final ITranscodeJobRepository jobRepository;
     private final ITranscodePresetRepository presetRepository;
-
+    private final FFmpegJobHandlerService jobHandlerService;
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository) {
+    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository, FFmpegJobHandlerService jobHandlerService) {
         jobLock = new ReentrantReadWriteLock();
         this.jobRepository = jobRepository;
         this.presetRepository = presetRepository;
+        this.jobHandlerService = jobHandlerService;
     }
 
     @Override
@@ -55,17 +60,40 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     public TranscodeJob updateJob(TranscodeJobUpdate updateData, Long jobId) {
         var job = getJob(jobId);
 
-        if (updateData.getInFile().isPresent()) {
-            job.setInFile(updateData.getInFile().get());
+        if (!StringUtils.isBlank(updateData.getInFile())) {
+            job.setInFile(updateData.getInFile());
         }
-        if (updateData.getOutFolder().isPresent()) {
-            job.setOutFolder(updateData.getOutFolder().get());
+        if (!StringUtils.isBlank(updateData.getOutFolder())) {
+            job.setOutFolder(updateData.getOutFolder());
         }
-        if (updateData.getPresetId().isPresent()) {
-            job.setPreset(presetRepository.findById(updateData.getPresetId().get()).get());
+        if (updateData.getPresetId() != null) {
+            job.setPreset(presetRepository.findById(updateData.getPresetId()).get());
         }
 
         return updateJob(job);
+    }
+
+    @Override
+    public void setJobStatus(@NotNull TranscodeJob job, ETranscodeServiceStatus status) {
+        try {
+            jobLock.writeLock().lock();
+
+            job.setStatus(status);
+            jobRepository.saveAndFlush(job);
+
+        } finally {
+            jobLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void enqueueJob(Long jobId) {
+        enqueueJob(getJob(jobId));
+    }
+
+    @Override
+    public void enqueueJob(TranscodeJob job) {
+        jobHandlerService.submit(new FFmpegCallable(job));
     }
 
     @Override
