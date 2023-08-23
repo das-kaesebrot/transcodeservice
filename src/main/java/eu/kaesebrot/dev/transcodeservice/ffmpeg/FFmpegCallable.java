@@ -12,23 +12,29 @@ import eu.kaesebrot.dev.transcodeservice.models.AudioTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.VideoTrackPreset;
-import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
-public class FFmpegRunnable implements Runnable {
+public class FFmpegCallable implements Callable<ETranscodeServiceStatus> {
     private final TranscodeJob job;
     private FFmpegSourceStream sourceStream;
     private FFmpegTargetStream targetStream;
-    private TranscodeJobService jobService;
 
-    public FFmpegRunnable(TranscodeJob job, TranscodeJobService jobService) {
+    public FFmpegCallable(TranscodeJob job) {
         this.job = job;
-        this.jobService = jobService;
 
         bootstrap();
+    }
+
+
+    /**
+     * @return The job as submitted via the constructor. This may not represent the job in its current state.
+     */
+    public TranscodeJob getAsociatedJob() {
+        return job;
     }
 
     private void bootstrap() {
@@ -96,23 +102,18 @@ public class FFmpegRunnable implements Runnable {
 
             sourceStream = source;
             targetStream = target;
-
-            jobService.setJobStatus(job, ETranscodeServiceStatus.CREATED);
         } catch (Exception e) {
-            jobService.setJobStatus(job, ETranscodeServiceStatus.FAILED);
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void run() {
+    public ETranscodeServiceStatus call() {
         try {
-            jobService.setJobStatus(job, ETranscodeServiceStatus.RUNNING);
             Transcoder.convert(sourceStream, targetStream, Double.MAX_VALUE);
-            jobService.setJobStatus(job, ETranscodeServiceStatus.SUCCESS);
+            return ETranscodeServiceStatus.SUCCESS;
         } catch (Exception e) {
-            jobService.setJobStatus(job, ETranscodeServiceStatus.FAILED);
-            throw new RuntimeException(e);
+            return ETranscodeServiceStatus.FAILED;
         }
     }
 }
