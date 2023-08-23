@@ -2,6 +2,8 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
+import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
+import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
@@ -25,6 +27,15 @@ public class AudioTrackPreset extends TrackPreset {
     }
 
     public void setAudioCodecName(String audioCodecName) {
+        if (StringUtils.isNullOrEmpty(audioCodecName)) {
+            this.audioCodecName = "copy"; // TODO check this
+            return;
+        }
+
+        if (!AVUtils.getSupportedAudioEncoders().contains(audioCodecName)) {
+            throw new IllegalArgumentException(String.format("Given codec '%s' is not supported!", audioCodecName));
+        }
+
         this.audioCodecName = audioCodecName;
     }
 
