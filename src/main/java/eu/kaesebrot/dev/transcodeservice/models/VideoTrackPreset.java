@@ -2,9 +2,13 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
+import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
+import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
+
+import java.util.Map;
 
 public class VideoTrackPreset extends TrackPreset {
     @NotBlank
@@ -26,10 +30,11 @@ public class VideoTrackPreset extends TrackPreset {
     @Nullable
     @JsonProperty("video_bitrate")
     private String videoBitrate;
-
     @Nullable
     @JsonProperty("video_pixel_format")
     private String videoPixelFormat;
+    @JsonProperty("video_options")
+    private Map<String, String> videoOptions;
 
     public String getVideoCodecName() {
         return videoCodecName;
@@ -101,6 +106,15 @@ public class VideoTrackPreset extends TrackPreset {
 
         this.videoPixelFormat = videoPixelFormat;
     }
+
+    public Map<String, String> getVideoOptions() {
+        return videoOptions;
+    }
+
+    public void setVideoOptions(Map<String, String> videoOptions) {
+        this.videoOptions = videoOptions;
+    }
+
     public ETrackPresetType getType() {
         return ETrackPresetType.VIDEO;
     }

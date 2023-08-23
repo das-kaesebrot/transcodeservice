@@ -5,6 +5,8 @@ import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
 import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
+import java.util.Map;
+
 public class AudioTrackPreset extends TrackPreset {
     @JsonProperty("audio_codec")
     private String audioCodecName;
@@ -15,6 +17,8 @@ public class AudioTrackPreset extends TrackPreset {
     @JsonProperty("audio_sample_rate")
     @Positive
     private Integer audioSampleRate;
+    @JsonProperty("audio_options")
+    private Map<String, String> audioOptions;
 
     public String getAudioCodecName() {
         return audioCodecName;
@@ -40,6 +44,14 @@ public class AudioTrackPreset extends TrackPreset {
 
     public void setAudioSampleRate(@Nullable Integer audioSampleRate) {
         this.audioSampleRate = audioSampleRate;
+    }
+
+    public Map<String, String> getAudioOptions() {
+        return audioOptions;
+    }
+
+    public void setAudioOptions(Map<String, String> audioOptions) {
+        this.audioOptions = audioOptions;
     }
 
     @Override
