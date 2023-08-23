@@ -2,6 +2,7 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -29,7 +30,7 @@ public class TranscodePreset implements Serializable {
 
     private String description;
 
-    @JsonProperty("container")
+    @JsonProperty("muxer")
     private String muxer;
 
     @CreationTimestamp
@@ -77,6 +78,10 @@ public class TranscodePreset implements Serializable {
     }
 
     public void setMuxer(String muxer) {
+        if (!AVUtils.getSupportedMuxers().contains(muxer)) {
+            throw new IllegalArgumentException(String.format("Given muxer '%s' is not supported!", muxer));
+        }
+
         this.muxer = muxer;
     }
 
