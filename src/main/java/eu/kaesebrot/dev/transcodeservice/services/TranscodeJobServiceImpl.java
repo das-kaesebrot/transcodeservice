@@ -1,8 +1,8 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobExecutor;
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegRunnable;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegCallable;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,13 +22,14 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 {
     private final ITranscodeJobRepository jobRepository;
     private final ITranscodePresetRepository presetRepository;
-    private final FFmpegJobExecutor jobExecutor = new FFmpegJobExecutor();
+    private final FFmpegJobHandlerService jobHandlerService;
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository) {
+    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository, FFmpegJobHandlerService jobHandlerService) {
         jobLock = new ReentrantReadWriteLock();
         this.jobRepository = jobRepository;
         this.presetRepository = presetRepository;
+        this.jobHandlerService = jobHandlerService;
     }
 
     @Override
@@ -92,7 +93,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 
     @Override
     public void enqueueJob(TranscodeJob job) {
-        jobExecutor.execute(new FFmpegRunnable(job, this));
+        jobHandlerService.submit(new FFmpegCallable(job));
     }
 
     @Override
