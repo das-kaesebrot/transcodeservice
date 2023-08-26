@@ -3,7 +3,6 @@ package eu.kaesebrot.dev.transcodeservice.api;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.rest.SupportedFormats;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
-import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +33,6 @@ public class TranscodePresetRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public SupportedFormats GetSupportedFormates() {
-        var supportedFormats = new SupportedFormats();
-
-        supportedFormats.setSupportedVideoEncoders(AVUtils.getSupportedVideoEncoders());
-        supportedFormats.setSupportedAudioEncoders(AVUtils.getSupportedAudioEncoders());
-        supportedFormats.setSupportedMuxerNames(AVUtils.getSupportedMuxers().stream().map(m -> m.name().getString()).toList());
-
-        return supportedFormats;
+        return new SupportedFormats();
     }
 }
