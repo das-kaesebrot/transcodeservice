@@ -9,6 +9,7 @@ import org.bytedeco.ffmpeg.avformat.AVOutputFormat;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.ffmpeg.global.avformat;
 import org.bytedeco.ffmpeg.global.avutil;
+import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.Pointer;
 
 import java.util.*;
@@ -27,6 +28,9 @@ public class AVUtils {
     private static List<String> videoDecoderNames;
     private static List<String> audioDecoderNames;
     private static List<AVOutputFormat> muxers;
+    private static Collection<AVCodec> codecs;
+    private static Map<String, List<Integer>> supportedAudioSampleRatesPerCodec;
+    private static Map<String, List<String>> supportedVideoPixFmtsPerCodec;
 
     public static String getInputFormat(String filename) {
         AVFormatContext formatContext = new AVFormatContext(null);
@@ -50,42 +54,90 @@ public class AVUtils {
         }
     }
 
-    public static Set<String> getSupportedAudioSampleRates(AVCodec codec) {
+    public static Map<String, List<Integer>> getSupportedAudioSampleRates() {
+        if (supportedAudioSampleRatesPerCodec != null || !supportedAudioSampleRatesPerCodec.isEmpty())
+            return supportedAudioSampleRatesPerCodec;
+
+        Map<String, List<Integer>> resultMap = new TreeMap<>();
+
+        for (var codec : iterateCodecs()) {
+            if (codec.type() != AVMEDIA_TYPE_AUDIO)
+                continue;
+
+            var sampleFmtNames = getSupportedAudioSampleRatesForCodec(codec);
+
+            resultMap.put(codec.name().getString(), sampleFmtNames);
+        }
+
+        supportedAudioSampleRatesPerCodec = resultMap;
+
+        return supportedAudioSampleRatesPerCodec;
+    }
+
+    public static List<Integer> getSupportedAudioSampleRatesForCodec(AVCodec codec) {
         if (codec.type() != AVMEDIA_TYPE_AUDIO)
             throw new IllegalArgumentException(String.format("Given codec '%s' is not an audio codec!", codec.name()));
 
-        var supportedSampleRates = new HashSet<String>();
+        if (codec.supported_samplerates() == null)
+            return List.of();
 
-        var sampleRatesPointer = codec.supported_samplerates();
+        var supportedSampleRates = new HashSet<Integer>();
 
-        // TODO does this work?
-        for (int i = 0; i < sampleRatesPointer.sizeof(); i++) {
-            supportedSampleRates.add(avutil.av_get_sample_fmt_name(sampleRatesPointer.get(i)).getString());
+        IntPointer samplerates = codec.supported_samplerates();
+
+        for (int i = 0; samplerates.get(i) != -1; i++) {
+            int samplerate = samplerates.get(i);
+            supportedSampleRates.add(samplerate);
         }
 
-        return supportedSampleRates;
+        return supportedSampleRates.stream().sorted().toList();
     }
 
-    public static Set<String> getSupportedPixelFormatNames(String codecName) {
+    public static Map<String, List<String>> getSupportedPixelFormatNames() {
+        if (supportedVideoPixFmtsPerCodec != null || !supportedVideoPixFmtsPerCodec.isEmpty())
+            return supportedVideoPixFmtsPerCodec;
+
+        Map<String, List<String>> resultMap = new TreeMap<>();
+
+        for (var codec : iterateCodecs()) {
+            if (codec.type() != AVMEDIA_TYPE_VIDEO)
+                continue;
+
+            var pixFmtNames = getSupportedPixelFormatNamesForCodec(codec);
+
+            resultMap.put(codec.name().getString(), pixFmtNames);
+        }
+
+        supportedVideoPixFmtsPerCodec = resultMap;
+
+        return supportedVideoPixFmtsPerCodec;
+    }
+
+    public static List<String> getSupportedPixelFormatNamesForCodec(String codecName) {
         try {
-            return getSupportedPixelFormatNames(FFmpeg.getCodecByName(codecName));
+            return getSupportedPixelFormatNamesForCodec(FFmpeg.getCodecByName(codecName));
         } catch (FFmpegException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Set<String> getSupportedPixelFormatNames(AVCodec codec) {
+    public static List<String> getSupportedPixelFormatNamesForCodec(AVCodec codec) {
         if (codec.type() != AVMEDIA_TYPE_VIDEO)
-            throw new IllegalArgumentException(String.format("Given codec '%s' is not a video codec!", codec.name()));
+            throw new IllegalArgumentException(String.format("Given codec '%s' is not a video codec!", codec.name().getString()));
 
-        var supportedPixFormatNames = new HashSet<String>();
+        if (codec.pix_fmts() == null)
+            return List.of();
 
-        var pix_fmts = codec.pix_fmts().getStringCodePoints();
+        var supportedPixFormatNames = new ArrayList<String>();
 
-        // TODO does this work?
-        for (var pixFormat : pix_fmts) {
-            supportedPixFormatNames.add(avutil.av_get_pix_fmt_name(pixFormat).getString());
+        IntPointer pixelFormats = codec.pix_fmts();
+
+        for (int i = 0; pixelFormats.get(i) != -1; i++) {
+            int pixelFormat = pixelFormats.get(i);
+            supportedPixFormatNames.add(avutil.av_get_pix_fmt_name(pixelFormat).getString());
         }
+
+        Collections.sort(supportedPixFormatNames);
 
         return supportedPixFormatNames;
     }
@@ -149,6 +201,10 @@ public class AVUtils {
         return audioDecoderNames;
     }
 
+    public static List<String> getSupportedMuxerNames() {
+        return getSupportedMuxers().stream().map(m -> m.name().getString()).toList();
+    }
+
     public static List<AVOutputFormat> getSupportedMuxers() {
         if (muxers == null || muxers.isEmpty()) {
             muxers = iterateMuxers().stream().toList();
@@ -171,6 +227,11 @@ public class AVUtils {
     }
 
     public static Collection<AVCodec> iterateCodecs() {
-        return iterate(avcodec::av_codec_iterate);
+        if (codecs == null || codecs.isEmpty())
+        {
+            codecs = iterate(avcodec::av_codec_iterate);
+        }
+
+        return codecs;
     }
 }
