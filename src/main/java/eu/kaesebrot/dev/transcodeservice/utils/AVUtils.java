@@ -32,7 +32,7 @@ public class AVUtils {
     private static Map<String, List<Integer>> supportedAudioSampleRatesPerCodec;
     private static Map<String, List<String>> supportedVideoPixFmtsPerCodec;
 
-    public static String getInputFormat(String filename) {
+    public static AVInputFormat getInputFormat(String filename) {
         AVFormatContext formatContext = new AVFormatContext(null);
 
         try {
@@ -41,13 +41,13 @@ public class AVUtils {
                 throw new RuntimeException("Couldn't open given file!");
             }
 
-            AVInputFormat inputFormat = avformat.av_find_input_format(formatContext.iformat().name().getString());
+            AVInputFormat inputFormat = formatContext.iformat();
             if (inputFormat == null) {
                 avformat.avformat_close_input(formatContext);
                 throw new RuntimeException("Format probing failed!");
             }
 
-            return inputFormat.name().getString();
+            return inputFormat;
 
         } finally {
             avformat.avformat_close_input(formatContext);
