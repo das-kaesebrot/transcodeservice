@@ -16,4 +16,14 @@ public final class StringUtils {
 
         return filename;
     }
+
+    public static String getFileExtension(String filename) {
+        int pos = filename.lastIndexOf(".");
+
+        if (pos > 0 && pos < (filename.length() - 1)) {
+            return filename.substring(pos + 1);
+        }
+
+        return filename;
+    }
 }
