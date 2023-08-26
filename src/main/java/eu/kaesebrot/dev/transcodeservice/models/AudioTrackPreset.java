@@ -54,6 +54,14 @@ public class AudioTrackPreset extends TrackPreset {
     }
 
     public void setAudioSampleRate(@Nullable Integer audioSampleRate) {
+        if (audioCodecName == null) {
+            return;
+        }
+
+        if (!AVUtils.getSupportedAudioSampleRatesForCodec(audioCodecName).isEmpty() && !AVUtils.getSupportedAudioSampleRatesForCodec(audioCodecName).contains(audioSampleRate)) {
+            throw new IllegalArgumentException(String.format("Given sample rate '%s' is not supported by codec '%s'!", audioSampleRate, audioCodecName));
+        }
+
         this.audioSampleRate = audioSampleRate;
     }
 
