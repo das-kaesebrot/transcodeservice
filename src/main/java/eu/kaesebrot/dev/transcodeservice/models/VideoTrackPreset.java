@@ -100,7 +100,7 @@ public class VideoTrackPreset extends TrackPreset {
             return;
         }
 
-        if (!AVUtils.getSupportedPixelFormatNames(videoCodecName).contains(videoPixelFormat)) {
+        if (!AVUtils.getSupportedPixelFormatNamesForCodec(videoCodecName).isEmpty() && !AVUtils.getSupportedPixelFormatNamesForCodec(videoCodecName).contains(videoPixelFormat)) {
             throw new IllegalArgumentException(String.format("Given pixel format '%s' is not supported by codec '%s'!", videoPixelFormat, videoCodecName));
         }
 
