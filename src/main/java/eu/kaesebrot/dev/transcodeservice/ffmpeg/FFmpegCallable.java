@@ -7,12 +7,12 @@ import com.github.manevolent.ffmpeg4j.stream.output.FFmpegTargetStream;
 import com.github.manevolent.ffmpeg4j.stream.source.FFmpegSourceStream;
 import com.github.manevolent.ffmpeg4j.transcoder.Transcoder;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
-import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.AudioTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.VideoTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
+import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -83,7 +83,9 @@ public class FFmpegCallable implements Callable<Void> {
             var videoOpts = new HashMap<String, String>();
 
             target.registerVideoSubstream(videoPreset.getVideoCodecName(), width, height, frame_rate, videoOpts);
-            // target.setPixelFormat(avutil.AV_PIX_FMT_RGB24);
+
+            if (!StringUtils.isNullOrEmpty(videoPreset.getVideoPixelFormat()))
+                target.setPixelFormat(FFmpeg.getPixelFormatByName(videoPreset.getVideoPixelFormat()));
 
             for (AudioSourceSubstream audioSubstream : source.getSubstreams().stream()
                     .filter(s -> s.getMediaType() == MediaType.AUDIO)
