@@ -18,10 +18,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
-public class FFmpegCallable implements Callable<ETranscodeServiceStatus> {
+public class FFmpegCallable implements Callable<Void> {
     private final TranscodeJob job;
     private FFmpegSourceStream sourceStream;
     private FFmpegTargetStream targetStream;
+    private Exception finalException;
 
     public FFmpegCallable(TranscodeJob job) {
         this.job = job;
@@ -108,12 +109,21 @@ public class FFmpegCallable implements Callable<ETranscodeServiceStatus> {
     }
 
     @Override
-    public ETranscodeServiceStatus call() {
+    public Void call() {
         try {
             Transcoder.convert(sourceStream, targetStream, Double.MAX_VALUE);
-            return ETranscodeServiceStatus.SUCCESS;
         } catch (Exception e) {
-            return ETranscodeServiceStatus.FAILED;
+            finalException = e;
         }
+
+        return null;
+    }
+
+    public boolean ranSuccessfully() {
+        return finalException == null;
+    }
+
+    public Exception getFinalException() {
+        return finalException;
     }
 }
