@@ -1,9 +1,12 @@
 package eu.kaesebrot.dev.transcodeservice.ffmpeg;
 
+import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
+
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.NoSuchElementException;
 
 public interface FFmpegJobHandlerService {
-    void submit(Callable<?> task);
-    List<? extends Callable<?>> getCompletedTasks();
+    void submit(TranscodeJob job);
+    List<TranscodeJob> getCompletedTasks() throws NoSuchElementException;
+    double getProgress(TranscodeJob job) throws NoSuchElementException;
 }
