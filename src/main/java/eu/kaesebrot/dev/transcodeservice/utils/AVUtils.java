@@ -2,6 +2,9 @@ package eu.kaesebrot.dev.transcodeservice.utils;
 
 import com.github.manevolent.ffmpeg4j.FFmpeg;
 import com.github.manevolent.ffmpeg4j.FFmpegException;
+import com.github.manevolent.ffmpeg4j.FFmpegIO;
+import com.github.manevolent.ffmpeg4j.stream.source.FFmpegSourceStream;
+import com.github.manevolent.ffmpeg4j.stream.source.SourceStream;
 import org.bytedeco.ffmpeg.avcodec.AVCodec;
 import org.bytedeco.ffmpeg.avformat.AVFormatContext;
 import org.bytedeco.ffmpeg.avformat.AVInputFormat;
@@ -12,6 +15,9 @@ import org.bytedeco.ffmpeg.global.avutil;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.Pointer;
 
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -60,6 +66,27 @@ public class AVUtils {
         } catch (FFmpegException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static double getTotalDuration(File file) {
+        double duration = 0D;
+
+        try (FFmpegSourceStream stream = FFmpegIO.openInput(file).open(getInputFormat(file.getPath()))) {
+            while (true) {
+                try {
+                    SourceStream.Packet packet = stream.readPacket();
+
+                    duration += packet.getDuration();
+
+                } catch (EOFException ex) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return duration;
     }
 
     public static List<Integer> getSupportedAudioSampleRatesForCodec(AVCodec codec) {
