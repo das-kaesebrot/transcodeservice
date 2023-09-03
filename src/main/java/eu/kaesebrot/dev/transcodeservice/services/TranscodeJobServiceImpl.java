@@ -1,7 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegCallable;
 import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
@@ -93,7 +92,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 
     @Override
     public void enqueueJob(TranscodeJob job) {
-        jobHandlerService.submit(new FFmpegCallable(job));
+        jobHandlerService.submit(job);
     }
 
     @Override
