@@ -52,7 +52,12 @@ public class TranscodeJobRestController {
     public TranscodeJob CreateNewJob(@RequestBody TranscodeJobCreation jobData) {
         var preset = presetService.getPreset(jobData.getPresetId());
         var job = new TranscodeJob(jobData.getInFile(), jobData.getOutFolder(), preset);
-        return jobService.insertJob(job);
+        job = jobService.insertJob(job);
+
+        if (jobData.enqueueImmeditely())
+            jobService.enqueueJob(job);
+
+        return jobService.getJob(job.getId());
     }
 
     @GetMapping(
