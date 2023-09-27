@@ -49,15 +49,4 @@ public class TranscodeJobCreation implements Serializable {
     public void setEnqueueImmediately(boolean enqueueImmediately) {
         this.enqueueImmediately = enqueueImmediately;
     }
-
-    public TranscodeJobCreation(String inFile, String outFolder, Long presetId) {
-        this.inFile = inFile;
-        this.outFolder = outFolder;
-        this.presetId = presetId;
-    }
-
-    public TranscodeJobCreation(String inFile, String outFolder, Long presetId, boolean enqueueImmediately) {
-        this(inFile, outFolder, presetId);
-        this.enqueueImmediately = enqueueImmediately;
-    }
 }
