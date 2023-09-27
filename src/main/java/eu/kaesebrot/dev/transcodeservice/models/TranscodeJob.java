@@ -122,7 +122,7 @@ public class TranscodeJob implements Serializable {
             throw new RuntimeException("Error while getting output format!", e);
         }
 
-        return Paths.get(outFolder, fileName + ext);
+        return Paths.get(outFolder, fileName + "." + ext);
     }
 
     public void setOutFolder(String outFolder) {
