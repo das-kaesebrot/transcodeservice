@@ -32,7 +32,7 @@ public class TranscodePresetRestController {
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.OK)
-    public SupportedFormats GetSupportedFormates() {
+    public SupportedFormats GetSupportedFormats() {
         return new SupportedFormats();
     }
 }
