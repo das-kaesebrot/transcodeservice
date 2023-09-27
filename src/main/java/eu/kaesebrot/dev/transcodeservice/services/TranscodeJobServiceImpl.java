@@ -96,6 +96,16 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     }
 
     @Override
+    public double getProgress(Long jobId) {
+        return getProgress(getJob(jobId));
+    }
+
+    @Override
+    public double getProgress(TranscodeJob job) {
+        return jobHandlerService.getProgress(job);
+    }
+
+    @Override
     public Optional<TranscodeJob> getJobOptional(Long id) {
         return jobRepository
                 .findById(id);

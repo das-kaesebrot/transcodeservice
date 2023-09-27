@@ -104,4 +104,13 @@ public class TranscodeJobRestController {
     public String GetStatus(@PathVariable Long id) {
         return jobService.getJob(id).getStatus().name();
     }
+
+    @GetMapping(
+            value = "jobs/{id}/progress",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public double GetProgress(@PathVariable Long id) {
+        return jobService.getProgress(id);
+    }
 }

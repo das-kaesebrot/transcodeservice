@@ -21,6 +21,8 @@ public interface TranscodeJobService
     void setJobStatus(TranscodeJob job, ETranscodeServiceStatus status);
     void enqueueJob(Long jobId);
     void enqueueJob(TranscodeJob job);
+    double getProgress(Long jobId);
+    double getProgress(TranscodeJob job);
     public void deleteJobById(Long id);
     public void deleteByStatusList(List<ETranscodeServiceStatus> statusList);
 }
