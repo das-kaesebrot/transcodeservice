@@ -91,7 +91,7 @@ public class FFmpegJobHandlerServiceImpl implements FFmpegJobHandlerService {
         if (!inFile.isFile())
             throw new IllegalArgumentException("File does not exist at given path! Path: " + job.getInFile());
 
-        try (FFmpegSourceStream source = FFmpegIO.openInput(inFile).open(AVUtils.getInputFormat(outFile.getName()));
+        try (FFmpegSourceStream source = FFmpegIO.openInput(inFile).open(AVUtils.getInputFormat(inFile.getAbsolutePath()));
              FFmpegTargetStream target = FFmpegIO.openOutput(outFile).open(preset.getMuxer())) {
             source.registerStreams();
 
