@@ -112,7 +112,7 @@ public class AVUtils {
     }
 
     public static Map<String, List<Integer>> getSupportedAudioSampleRates() {
-        if (supportedAudioSampleRatesPerCodec != null || !supportedAudioSampleRatesPerCodec.isEmpty())
+        if (supportedAudioSampleRatesPerCodec != null && !supportedAudioSampleRatesPerCodec.isEmpty())
             return supportedAudioSampleRatesPerCodec;
 
         Map<String, List<Integer>> resultMap = new TreeMap<>();
@@ -142,7 +142,7 @@ public class AVUtils {
     }
 
     public static Map<String, List<String>> getSupportedPixelFormatNames() {
-        if (supportedVideoPixFmtsPerCodec != null || !supportedVideoPixFmtsPerCodec.isEmpty())
+        if (supportedVideoPixFmtsPerCodec != null && !supportedVideoPixFmtsPerCodec.isEmpty())
             return supportedVideoPixFmtsPerCodec;
 
         Map<String, List<String>> resultMap = new TreeMap<>();
