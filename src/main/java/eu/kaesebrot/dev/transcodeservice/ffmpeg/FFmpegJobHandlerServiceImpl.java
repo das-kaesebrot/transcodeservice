@@ -65,7 +65,7 @@ public class FFmpegJobHandlerServiceImpl implements FFmpegJobHandlerService {
                 .findFirst().orElseThrow()
                 .getProgress();
          */
-        return 0D; // TODO implement progess getter
+        return -1D; // TODO implement progess getter
     }
 
 
