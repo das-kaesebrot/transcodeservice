@@ -2,6 +2,7 @@ package eu.kaesebrot.dev.transcodeservice.api;
 
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.rest.SupportedFormats;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodePresetCreation;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,9 @@ public class TranscodePresetRestController {
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public TranscodePreset CreateNewPreset() {
-        return presetService.insertPreset(new TranscodePreset());
+    public TranscodePreset CreateNewPreset(@RequestBody TranscodePresetCreation presetCreation) {
+        // TODO
+        return presetService.insertPreset(presetCreation.generateNewPreset());
     }
 
     @GetMapping(
