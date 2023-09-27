@@ -1,5 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.manevolent.ffmpeg4j.FFmpeg;
 import com.github.manevolent.ffmpeg4j.FFmpegException;
@@ -97,6 +98,7 @@ public class TranscodeJob implements Serializable {
         return outFolder;
     }
 
+    @JsonIgnore
     public Path getOutFileName() {
         if (StringUtils.isNullOrEmpty(inFile))
             return null;
