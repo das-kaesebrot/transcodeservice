@@ -48,6 +48,7 @@ public class TranscodePreset implements Serializable {
     private Set<TranscodeJob> jobs;
 
     @ElementCollection
+    @Column(length=99999)
     @JsonProperty("track_presets")
     private Set<TrackPreset> trackPresets = new HashSet<>();
 
