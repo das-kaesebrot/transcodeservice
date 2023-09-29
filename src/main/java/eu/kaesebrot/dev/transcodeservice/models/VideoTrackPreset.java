@@ -4,12 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
 import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
 import java.util.Map;
 
+@Embeddable
 public class VideoTrackPreset extends TrackPreset {
     @NotBlank
     @JsonProperty("video_codec")
@@ -34,6 +37,7 @@ public class VideoTrackPreset extends TrackPreset {
     @JsonProperty("video_pixel_format")
     private String videoPixelFormat;
     @JsonProperty("video_options")
+    @ElementCollection
     private Map<String, String> videoOptions;
 
     public String getVideoCodecName() {

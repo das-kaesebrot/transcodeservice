@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
 import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
 import java.util.Map;
 
+@Embeddable
 public class AudioTrackPreset extends TrackPreset {
     @JsonProperty("audio_codec")
     private String audioCodecName;
@@ -20,6 +23,7 @@ public class AudioTrackPreset extends TrackPreset {
     @Positive
     private Integer audioSampleRate;
     @JsonProperty("audio_options")
+    @ElementCollection
     private Map<String, String> audioOptions;
 
     public String getAudioCodecName() {
