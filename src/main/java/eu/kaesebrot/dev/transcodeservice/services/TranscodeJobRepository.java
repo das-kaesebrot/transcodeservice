@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @Repository
-public interface ITranscodeJobRepository extends JpaRepository<TranscodeJob, Long> {
+public interface TranscodeJobRepository extends JpaRepository<TranscodeJob, Long> {
     void deleteAllByStatus(ETranscodeServiceStatus transcodeStatus);
     void deleteAllByStatusIn(List<ETranscodeServiceStatus> transcodeServiceStatuses);
     Stream<TranscodeJob> getByStatusIn(List<ETranscodeServiceStatus> transcodeStatuses);

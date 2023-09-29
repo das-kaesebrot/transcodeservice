@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ITranscodePresetRepository extends JpaRepository<TranscodePreset, Long> {
+public interface TranscodePresetRepository extends JpaRepository<TranscodePreset, Long> {
     Optional<TranscodePreset> findByJobsContains(TranscodeJob job);
 }

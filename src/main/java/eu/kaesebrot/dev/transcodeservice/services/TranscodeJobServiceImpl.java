@@ -20,11 +20,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Transactional
 public class TranscodeJobServiceImpl implements TranscodeJobService
 {
-    private final ITranscodeJobRepository jobRepository;
-    private final ITranscodePresetRepository presetRepository;
+    private final TranscodeJobRepository jobRepository;
+    private final TranscodePresetRepository presetRepository;
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository) {
+    public TranscodeJobServiceImpl(TranscodeJobRepository jobRepository, TranscodePresetRepository presetRepository) {
         jobLock = new ReentrantReadWriteLock();
         this.jobRepository = jobRepository;
         this.presetRepository = presetRepository;
