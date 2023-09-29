@@ -70,6 +70,11 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     }
 
     @Override
+    public void setJobStatus(Long jobId, ETranscodeServiceStatus status) {
+        setJobStatus(getJob(jobId), status);
+    }
+
+    @Override
     public void setJobStatus(@NotNull TranscodeJob job, ETranscodeServiceStatus status) {
         try {
             jobLock.writeLock().lock();
