@@ -81,9 +81,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
         try {
             jobLock.writeLock().lock();
 
-            job.setStatus(status);
-            jobRepository.saveAndFlush(job);
-
+            jobRepository.updateStatus(job.getId(), status);
         } finally {
             jobLock.writeLock().unlock();
         }
