@@ -2,10 +2,12 @@ package eu.kaesebrot.dev.transcodeservice.ffmpeg;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
+import eu.kaesebrot.dev.transcodeservice.services.ITranscodeJobRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -17,9 +19,11 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
     private final Map<Long, Future<?>> submittedTasks = new HashMap<>();
     private final TranscodeJobService jobService;
+    private final ITranscodeJobRepository jobRepository;
     private final Logger logger = LoggerFactory.getLogger(FFmpegJobHandlerServiceImpl.class);
-    public FFmpegJobHandlerServiceImpl(TranscodeJobService jobService) {
+    public FFmpegJobHandlerServiceImpl(TranscodeJobService jobService, ITranscodeJobRepository jobRepository) {
         this.jobService = jobService;
+        this.jobRepository = jobRepository;
 
         runHousekeepingJob();
     }
@@ -70,8 +74,21 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     private void runHousekeepingJob() {
         TimerTask task = new TimerTask() {
             private final Logger logger = LoggerFactory.getLogger("jobhandler-housekeeping");
+            @Transactional
             public void run() {
                 logger.debug("Starting housekeeping run");
+
+                if (submittedTasks.isEmpty())
+                    return;
+
+                var repoStatusLists = jobRepository.findStatuses(submittedTasks.keySet());
+                Map repoStatusMap = HashMap.newHashMap(repoStatusLists.size());
+
+                // Place results in map
+                for (Object[] results: repoStatusLists) {
+                    repoStatusMap.put((Long) results[0], (ETranscodeServiceStatus) results[1]);
+                }
+
                 for (var entry : submittedTasks.entrySet()) {
                     var state = entry.getValue().state();
                     Long jobId = entry.getKey();
@@ -85,9 +102,13 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
                         case SUCCESS -> newStatus = ETranscodeServiceStatus.SUCCESS;
                     }
 
-                    if (newStatus != null) {
-                        logger.debug(String.format("Setting status %s for job %s", newStatus.name(), jobId));
+                    if (newStatus != repoStatusMap.get(jobId)) {
+                        logger.info(String.format("Setting status %s for job %s", newStatus.name(), jobId));
                         jobService.setJobStatus(jobId, newStatus);
+                    }
+
+                    if (entry.getValue().isDone()) {
+                        submittedTasks.remove(jobId);
                     }
                 }
 
