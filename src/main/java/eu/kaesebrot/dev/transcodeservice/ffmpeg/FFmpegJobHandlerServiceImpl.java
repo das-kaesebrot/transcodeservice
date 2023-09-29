@@ -1,9 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.ffmpeg;
 
-import com.github.manevolent.ffmpeg4j.transcoder.Transcoder;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
-import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +16,9 @@ import java.util.concurrent.Future;
 public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
     private final Map<Long, Future<?>> submittedTasks = new HashMap<>();
-    private final Map<Long, Transcoder> transcoders = new HashMap<>();
-    private final ITranscodePresetRepository presetRepository;
     private final TranscodeJobService jobService;
-    public FFmpegJobHandlerServiceImpl(ITranscodePresetRepository presetRepository, TranscodeJobService jobService) {
-        this.presetRepository = presetRepository;
+    private final Logger logger = LoggerFactory.getLogger(FFmpegJobHandlerServiceImpl.class);
+    public FFmpegJobHandlerServiceImpl(TranscodeJobService jobService) {
         this.jobService = jobService;
 
         runHousekeepingJob();
