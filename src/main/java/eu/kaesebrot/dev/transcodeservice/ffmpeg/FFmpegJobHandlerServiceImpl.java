@@ -82,7 +82,7 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
                     return;
 
                 var repoStatusLists = jobRepository.findStatuses(submittedTasks.keySet());
-                Map repoStatusMap = HashMap.newHashMap(repoStatusLists.size());
+                Map<Long, ETranscodeServiceStatus> repoStatusMap = HashMap.newHashMap(repoStatusLists.size());
 
                 // Place results in map
                 for (Object[] results: repoStatusLists) {
