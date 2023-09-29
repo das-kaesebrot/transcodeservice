@@ -5,6 +5,8 @@ import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.services.ITranscodePresetRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,6 +24,8 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     public FFmpegJobHandlerServiceImpl(ITranscodePresetRepository presetRepository, TranscodeJobService jobService) {
         this.presetRepository = presetRepository;
         this.jobService = jobService;
+
+        runHousekeepingJob();
     }
 
     @Override
@@ -65,5 +69,38 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
                 .getProgress();
          */
         return -1D; // TODO implement progess getter
+    }
+
+    private void runHousekeepingJob() {
+        TimerTask task = new TimerTask() {
+            private final Logger logger = LoggerFactory.getLogger("jobhandler-housekeeping");
+            public void run() {
+                logger.debug("Starting housekeeping run");
+                for (var entry : submittedTasks.entrySet()) {
+                    var state = entry.getValue().state();
+                    Long jobId = entry.getKey();
+
+                    ETranscodeServiceStatus newStatus = null;
+
+                    switch (state) {
+                        case RUNNING -> newStatus = ETranscodeServiceStatus.RUNNING;
+                        case CANCELLED -> newStatus = ETranscodeServiceStatus.ABORTED;
+                        case FAILED -> newStatus = ETranscodeServiceStatus.FAILED;
+                        case SUCCESS -> newStatus = ETranscodeServiceStatus.SUCCESS;
+                    }
+
+                    if (newStatus != null) {
+                        logger.debug(String.format("Setting status %s for job %s", newStatus.name(), jobId));
+                        jobService.setJobStatus(jobId, newStatus);
+                    }
+                }
+
+                logger.debug("Housekeeping completed");
+            }
+        };
+
+        Timer timer = new Timer("Timer");
+        long delay = 1000L;
+        timer.schedule(task, delay);
     }
 }
