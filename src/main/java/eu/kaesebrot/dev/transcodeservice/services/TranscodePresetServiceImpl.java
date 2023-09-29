@@ -4,12 +4,14 @@ import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
+@Transactional
 public class TranscodePresetServiceImpl implements TranscodePresetService {
 
     private final ITranscodePresetRepository repository;
