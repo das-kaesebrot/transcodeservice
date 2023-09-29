@@ -28,6 +28,7 @@ public class TranscodePreset implements Serializable {
     @JsonProperty("id")
     private Long id;
 
+    @Column(length = 256)
     private String description;
 
     @JsonProperty("muxer")
@@ -71,6 +72,9 @@ public class TranscodePreset implements Serializable {
     }
 
     public void setDescription(String description) {
+        if (description.length() > 256)
+            throw new IllegalArgumentException("Description can't be longer than 256 chars!");
+
         this.description = description;
     }
     public String getMuxer() {
