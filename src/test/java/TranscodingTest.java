@@ -14,12 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +34,7 @@ public class TranscodingTest {
     @Autowired
     private TranscodePresetRestController presetController;
     @Test
+    @Transactional
     public void testTranscoding() throws InterruptedException {
         URL resource = AVUtilsTest.class.getResource("/gran_dillama.mp4");
 
