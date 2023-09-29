@@ -26,7 +26,7 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
 
     @Override
     public void submit(Long jobId) {
-
+        submit(jobService.getJob(jobId));
     }
 
     @Override
