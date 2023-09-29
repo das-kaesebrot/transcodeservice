@@ -33,18 +33,22 @@ public class TranscodeJob implements Serializable {
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "in_file", nullable = false)
+    @JsonProperty("in_file")
     private String inFile;
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "out_folder", nullable = false)
+    @JsonProperty("out_folder")
     private String outFolder;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
+    @JsonProperty("created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
+    @JsonProperty("modified_at")
     private Timestamp modifiedAt;
 
     @ManyToOne
