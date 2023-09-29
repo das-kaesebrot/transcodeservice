@@ -2,6 +2,7 @@ package eu.kaesebrot.dev.transcodeservice.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.manevolent.ffmpeg4j.FFmpeg;
 import com.github.manevolent.ffmpeg4j.FFmpegException;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
@@ -48,6 +49,7 @@ public class TranscodeJob implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "preset_id")
+    @JsonIgnore
     private TranscodePreset preset;
 
     private ETranscodeServiceStatus status;
@@ -70,6 +72,11 @@ public class TranscodeJob implements Serializable {
 
     public ETranscodeServiceStatus getStatus() {
         return status;
+    }
+
+    @JsonProperty("preset_id")
+    public Long getPresetId() {
+        return preset.getId();
     }
 
     @Override
@@ -138,11 +145,11 @@ public class TranscodeJob implements Serializable {
     }
 
     public void setStatus(ETranscodeServiceStatus status) {
-        if (status.ordinal() < status.ordinal()) {
+        if (status.ordinal() < this.status.ordinal()) {
             throw new IllegalArgumentException("Status can't be set to a lower value!");
         }
 
-        status = status;
+        this.status = status;
     }
 
     public TranscodeJob(
