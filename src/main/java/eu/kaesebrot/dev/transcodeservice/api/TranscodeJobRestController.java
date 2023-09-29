@@ -1,6 +1,7 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
 import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.JobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.rest.PingResponse;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
@@ -20,10 +21,12 @@ public class TranscodeJobRestController {
     private final TranscodeJobService jobService;
 
     private final TranscodePresetService presetService;
+    private final JobHandlerService jobHandlerService;
 
-    public TranscodeJobRestController(TranscodeJobService jobService, TranscodePresetService presetService) {
+    public TranscodeJobRestController(TranscodeJobService jobService, TranscodePresetService presetService, JobHandlerService jobHandlerService) {
         this.jobService = jobService;
         this.presetService = presetService;
+        this.jobHandlerService = jobHandlerService;
     }
 
     @GetMapping(
@@ -55,7 +58,7 @@ public class TranscodeJobRestController {
         job = jobService.insertJob(job);
 
         if (jobData.enqueueImmeditely())
-            jobService.enqueueJob(job);
+            jobHandlerService.submit(job);
 
         return jobService.getJob(job.getId());
     }
@@ -87,7 +90,7 @@ public class TranscodeJobRestController {
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob ChangeStatus(@PathVariable Long id, @RequestBody StatusPutRequest status) {
         if (status.equals(StatusPutRequest.START)) {
-            jobService.enqueueJob(id);
+            jobHandlerService.submit(id);
         }
         else if (status.equals(StatusPutRequest.ABORT)) {
             throw new UnsupportedOperationException("Not supported yet");
@@ -111,6 +114,6 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public double GetProgress(@PathVariable Long id) {
-        return jobService.getProgress(id);
+        return jobHandlerService.getProgress(id);
     }
 }

@@ -1,7 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,14 +20,12 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 {
     private final ITranscodeJobRepository jobRepository;
     private final ITranscodePresetRepository presetRepository;
-    private final FFmpegJobHandlerService jobHandlerService;
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository, FFmpegJobHandlerService jobHandlerService) {
+    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository) {
         jobLock = new ReentrantReadWriteLock();
         this.jobRepository = jobRepository;
         this.presetRepository = presetRepository;
-        this.jobHandlerService = jobHandlerService;
     }
 
     @Override
@@ -83,26 +80,6 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
         } finally {
             jobLock.writeLock().unlock();
         }
-    }
-
-    @Override
-    public void enqueueJob(Long jobId) {
-        enqueueJob(getJob(jobId));
-    }
-
-    @Override
-    public void enqueueJob(TranscodeJob job) {
-        jobHandlerService.submit(job);
-    }
-
-    @Override
-    public double getProgress(Long jobId) {
-        return getProgress(getJob(jobId));
-    }
-
-    @Override
-    public double getProgress(TranscodeJob job) {
-        return jobHandlerService.getProgress(job);
     }
 
     @Override
