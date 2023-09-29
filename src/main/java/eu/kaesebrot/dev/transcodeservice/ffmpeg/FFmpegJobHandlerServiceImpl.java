@@ -97,6 +97,7 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
 
         Timer timer = new Timer("Timer");
         long delay = 1000L;
-        timer.schedule(task, delay);
+        long period = 1000L;
+        timer.scheduleAtFixedRate(task, delay, period);
     }
 }
