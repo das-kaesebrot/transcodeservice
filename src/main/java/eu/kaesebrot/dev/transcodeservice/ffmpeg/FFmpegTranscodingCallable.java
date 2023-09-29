@@ -24,6 +24,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -46,6 +48,7 @@ public class FFmpegTranscodingCallable implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
+        var start = Instant.now();
         logger.info("Generating transcoder options");
 
         File inFile = new File(job.getInFile());
@@ -118,7 +121,10 @@ public class FFmpegTranscodingCallable implements Callable<Void> {
             logger.info("Starting transcoder");
 
             transcoder.transcode();
+            var end = Instant.now();
             logger.info("Transcoding completed successfully");
+
+            logger.info(String.format("Transcoding took %s", Duration.between(start, end)));
         } catch (Exception e) {
             logger.error("Transcoder ran into an exception", e);
             throw e;
