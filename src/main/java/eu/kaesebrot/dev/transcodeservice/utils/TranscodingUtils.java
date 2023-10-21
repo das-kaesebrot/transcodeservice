@@ -82,6 +82,8 @@ public final class TranscodingUtils {
         logger.debug(String.format("[VIDEO] Codec: %s", videoPreset.getVideoCodecName()));
 
 
+        // TODO implement support for multiple audio tracks
+
         int samplerate = firstInputAudioStream.sample_rate;
 
         if (audioPreset.getAudioSampleRate() != null && audioPreset.getAudioSampleRate() != samplerate) {
