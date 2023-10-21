@@ -4,24 +4,35 @@ import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
+import eu.kaesebrot.dev.transcodeservice.utils.TranscodingUtils;
+import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.FFmpegUtils;
+import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.job.FFmpegJob;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
+import net.bramp.ffmpeg.progress.Progress;
+import net.bramp.ffmpeg.progress.ProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
-    private final Map<Long, Future<?>> submittedTasks = new HashMap<>();
+    private final FFmpegExecutor fFmpegExecutor = new FFmpegExecutor();
+    private final Map<Long, FFmpegJob> submittedTasks = new HashMap<>();
+    private final Map<Long, Double> progressMap = new HashMap<>();
     private final TranscodeJobService jobService;
     private final TranscodeJobRepository jobRepository;
     private final Logger logger = LoggerFactory.getLogger(FFmpegJobHandlerServiceImpl.class);
-    public FFmpegJobHandlerServiceImpl(TranscodeJobService jobService, TranscodeJobRepository jobRepository) {
+    public FFmpegJobHandlerServiceImpl(TranscodeJobService jobService, TranscodeJobRepository jobRepository) throws IOException {
         this.jobService = jobService;
         this.jobRepository = jobRepository;
 
@@ -34,12 +45,46 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     }
 
     @Override
-    public void submit(TranscodeJob job) {
-        FFmpegTranscodingCallable transcodingCallable = new FFmpegTranscodingCallable(job, job.getPreset(), job.getPreset().getTrackPresets());
+    public void submit(TranscodeJob transcodeJob) {
+        FFmpegProbeResult in;
+        try {
+            in = new FFprobe().probe(transcodeJob.getInFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        Future<?> transcodingFuture = executor.submit(transcodingCallable);
-        submittedTasks.put(job.getId(), transcodingFuture);
-        jobService.setJobStatus(job.getId(), ETranscodeServiceStatus.QUEUED);
+        var builder = TranscodingUtils.generateTranscoder(transcodeJob, in, transcodeJob.getPreset().getTrackPresets());
+        FFmpegJob job = fFmpegExecutor.createJob(builder, new ProgressListener() {
+
+            // Using the FFmpegProbeResult determine the duration of the input
+            final double duration_ns = in.getFormat().duration * TimeUnit.SECONDS.toNanos(1);
+            final long jobId = transcodeJob.getId();
+
+            @Override
+            public void progress(Progress progress) {
+                double percentage = progress.out_time_ns / duration_ns;
+
+                // set progress in the progressMap
+                progressMap.put(jobId, percentage);
+
+                // Print out interesting information about the progress
+                logger.info(String.format(
+                        "[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx",
+                        percentage * 100,
+                        progress.status,
+                        progress.frame,
+                        FFmpegUtils.toTimecode(progress.out_time_ns, TimeUnit.NANOSECONDS),
+                        progress.fps.doubleValue(),
+                        progress.speed
+                ));
+            }
+        });
+
+        var future = executor.submit(job);
+
+        progressMap.put(transcodeJob.getId(), 0.0D);
+        submittedTasks.put(transcodeJob.getId(), job);
+        jobService.setJobStatus(transcodeJob.getId(), ETranscodeServiceStatus.QUEUED);
     }
 
     @Override
