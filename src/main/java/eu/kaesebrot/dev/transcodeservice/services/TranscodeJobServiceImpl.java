@@ -73,7 +73,7 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
 
     @Override
     public void setJobStatus(Long jobId, ETranscodeServiceStatus status) {
-        setJobStatus(getJob(jobId), status);
+        jobRepository.updateStatus(jobId, status);
     }
 
     @Override

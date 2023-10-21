@@ -5,6 +5,7 @@ import eu.kaesebrot.dev.transcodeservice.ffmpeg.JobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.rest.PingResponse;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
+import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
@@ -18,12 +19,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/transcodeservice")
 @Tag(name = "job", description = "The TranscodeJob API")
 public class TranscodeJobRestController {
+    private final TranscodeJobRepository jobRepository;
     private final TranscodeJobService jobService;
-
     private final TranscodePresetService presetService;
     private final JobHandlerService jobHandlerService;
 
-    public TranscodeJobRestController(TranscodeJobService jobService, TranscodePresetService presetService, JobHandlerService jobHandlerService) {
+    public TranscodeJobRestController(TranscodeJobRepository jobRepository, TranscodeJobService jobService, TranscodePresetService presetService, JobHandlerService jobHandlerService) {
+        this.jobRepository = jobRepository;
         this.jobService = jobService;
         this.presetService = presetService;
         this.jobHandlerService = jobHandlerService;
@@ -105,7 +107,7 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public String GetStatus(@PathVariable Long id) {
-        return jobService.getJob(id).getStatus().name();
+        return jobRepository.getStatus(id).name();
     }
 
     @GetMapping(
