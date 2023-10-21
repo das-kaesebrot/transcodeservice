@@ -128,16 +128,16 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
                 }
 
                 for (var entry : submittedTasks.entrySet()) {
-                    var state = entry.getValue().state();
+                    var state = entry.getValue().getState();
                     Long jobId = entry.getKey();
 
                     ETranscodeServiceStatus newStatus = null;
 
                     switch (state) {
                         case RUNNING -> newStatus = ETranscodeServiceStatus.RUNNING;
-                        case CANCELLED -> newStatus = ETranscodeServiceStatus.ABORTED;
+                        case WAITING -> newStatus = ETranscodeServiceStatus.QUEUED;
                         case FAILED -> newStatus = ETranscodeServiceStatus.FAILED;
-                        case SUCCESS -> newStatus = ETranscodeServiceStatus.SUCCESS;
+                        case FINISHED -> newStatus = ETranscodeServiceStatus.SUCCESS;
                     }
 
                     if (newStatus != repoStatusMap.get(jobId)) {
