@@ -92,7 +92,7 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
         List<TranscodeJob> resultList = new ArrayList<>();
 
         for (var taskKeyValuePair : submittedTasks.entrySet()) {
-            if (taskKeyValuePair.getValue().isDone())
+            if (jobDone(taskKeyValuePair.getValue()))
                 resultList.add(jobService.getJob(taskKeyValuePair.getKey()));
         }
 
@@ -145,7 +145,8 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
                         jobService.setJobStatus(jobId, newStatus);
                     }
 
-                    if (entry.getValue().isDone()) {
+                    if (jobDone(entry.getValue())) {
+                        progressMap.remove(jobId);
                         submittedTasks.remove(jobId);
                     }
                 }
@@ -158,5 +159,10 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
         long delay = 1000L;
         long period = 1000L;
         timer.scheduleAtFixedRate(task, delay, period);
+    }
+
+    private boolean jobDone(FFmpegJob job) {
+        return job.getState() == FFmpegJob.State.FINISHED
+                || job.getState() == FFmpegJob.State.FAILED;
     }
 }
