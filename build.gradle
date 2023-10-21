@@ -23,7 +23,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
     implementation 'org.xerial:sqlite-jdbc:3.42.0.1'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.2.7.Final'
-    implementation 'com.github.manevolent:ffmpeg4j:5.1.2-1.5.8-4'
+    implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
     implementation 'com.h2database:h2:2.1.214'
     testImplementation 'junit:junit:4.13.1'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
