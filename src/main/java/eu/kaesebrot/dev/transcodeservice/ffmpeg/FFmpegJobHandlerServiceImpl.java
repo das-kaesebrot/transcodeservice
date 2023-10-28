@@ -101,11 +101,13 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
 
     @Override
     public double getProgress(Long jobId) throws NoSuchElementException {
-        return progressMap.get(jobId);
+        return progressMap.getOrDefault(jobId, -1D);
     }
 
     @Override
     public double getProgress(TranscodeJob job) throws NoSuchElementException {
+        if (job.getStatus() == ETranscodeServiceStatus.SUCCESS) return 1D;
+
         return getProgress(job.getId());
     }
 
