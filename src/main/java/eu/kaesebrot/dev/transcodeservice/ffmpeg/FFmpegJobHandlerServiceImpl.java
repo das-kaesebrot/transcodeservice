@@ -115,40 +115,28 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
         TimerTask task = new TimerTask() {
             @Transactional
             public void run() {
-                logger.debug("Starting housekeeping run");
-
-                if (submittedTasks.isEmpty())
+                if (runningTasks.isEmpty())
                     return;
 
-                var repoStatusLists = jobRepository.findStatuses(submittedTasks.keySet());
-                Map<Long, ETranscodeServiceStatus> repoStatusMap = HashMap.newHashMap(repoStatusLists.size());
+                logger.debug("Starting housekeeping run");
 
-                // Place results in map
-                for (Object[] results: repoStatusLists) {
-                    repoStatusMap.put((Long) results[0], (ETranscodeServiceStatus) results[1]);
-                }
-
-                for (var entry : submittedTasks.entrySet()) {
-                    var state = entry.getValue().getState();
+                for (var entry : runningTasks.entrySet()) {
+                    var state = entry.getValue();
                     Long jobId = entry.getKey();
 
                     ETranscodeServiceStatus newStatus = null;
+                    if (state.isCancelled())
+                        newStatus = ETranscodeServiceStatus.FAILED;
+                    else if (state.isDone())
+                        newStatus = ETranscodeServiceStatus.SUCCESS;
+                    else
+                        newStatus = ETranscodeServiceStatus.RUNNING;
 
-                    switch (state) {
-                        case RUNNING -> newStatus = ETranscodeServiceStatus.RUNNING;
-                        case WAITING -> newStatus = ETranscodeServiceStatus.QUEUED;
-                        case FAILED -> newStatus = ETranscodeServiceStatus.FAILED;
-                        case FINISHED -> newStatus = ETranscodeServiceStatus.SUCCESS;
-                    }
-
-                    if (newStatus != repoStatusMap.get(jobId)) {
-                        logger.info(String.format("Setting status %s for job %s", newStatus.name(), jobId));
-                        jobService.setJobStatus(jobId, newStatus);
-                    }
+                    updateJobStatus(jobId, newStatus);
 
                     if (jobDone(entry.getValue())) {
                         progressMap.remove(jobId);
-                        submittedTasks.remove(jobId);
+                        runningTasks.remove(jobId);
                     }
                 }
 
@@ -162,8 +150,14 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
         timer.scheduleAtFixedRate(task, delay, period);
     }
 
-    private boolean jobDone(FFmpegJob job) {
-        return job.getState() == FFmpegJob.State.FINISHED
-                || job.getState() == FFmpegJob.State.FAILED;
+    private boolean jobDone(FFmpegResultFuture job) {
+        return job.isDone() || job.isCancelled();
+    }
+
+    private void updateJobStatus(long jobId, ETranscodeServiceStatus status) {
+        if (status != jobRepository.getStatus(jobId)) {
+            logger.info(String.format("Setting status %s for job %s", status.name(), jobId));
+            jobService.setJobStatus(jobId, status);
+        }
     }
 }
