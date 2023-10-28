@@ -91,7 +91,7 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     public List<TranscodeJob> getCompletedTasks() throws NoSuchElementException {
         List<TranscodeJob> resultList = new ArrayList<>();
 
-        for (var taskKeyValuePair : submittedTasks.entrySet()) {
+        for (var taskKeyValuePair : runningTasks.entrySet()) {
             if (jobDone(taskKeyValuePair.getValue()))
                 resultList.add(jobService.getJob(taskKeyValuePair.getKey()));
         }
