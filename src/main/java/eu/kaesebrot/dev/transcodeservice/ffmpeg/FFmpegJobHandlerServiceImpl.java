@@ -1,17 +1,13 @@
 package eu.kaesebrot.dev.transcodeservice.ffmpeg;
 
+import com.github.kokorin.jaffree.ffmpeg.*;
+import com.github.kokorin.jaffree.ffprobe.FFprobeResult;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
+import eu.kaesebrot.dev.transcodeservice.utils.FFmpegFactory;
 import eu.kaesebrot.dev.transcodeservice.utils.TranscodingUtils;
-import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFmpegUtils;
-import net.bramp.ffmpeg.FFprobe;
-import net.bramp.ffmpeg.job.FFmpegJob;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
-import net.bramp.ffmpeg.progress.Progress;
-import net.bramp.ffmpeg.progress.ProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,8 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
-    private final FFmpegExecutor fFmpegExecutor = new FFmpegExecutor();
-    private final Map<Long, FFmpegJob> submittedTasks = new HashMap<>();
+    private final Map<Long, FFmpegResultFuture> runningTasks = new HashMap<>();
     private final Map<Long, Double> progressMap = new HashMap<>();
     private final TranscodeJobService jobService;
     private final TranscodeJobRepository jobRepository;
@@ -46,44 +42,48 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
 
     @Override
     public void submit(TranscodeJob transcodeJob) {
-        FFmpegProbeResult in;
-        try {
-            in = new FFprobe().probe(transcodeJob.getInFile());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FFprobeResult in = FFmpegFactory.getFFprobe()
+                .setInput(transcodeJob.getInFile())
+                .setShowStreams(true)
+                .setShowFormat(true)
+                .execute();
 
-        var builder = TranscodingUtils.generateTranscoder(transcodeJob, in, transcodeJob.getPreset().getTrackPresets());
-        FFmpegJob job = fFmpegExecutor.createJob(builder, new ProgressListener() {
+        FFmpeg job = TranscodingUtils.generateTranscoder(transcodeJob, in, transcodeJob.getPreset().getTrackPresets())
+                .setProgressListener(new ProgressListener() {
 
-            // Using the FFmpegProbeResult determine the duration of the input
-            final double duration_ns = in.getFormat().duration * TimeUnit.SECONDS.toNanos(1);
-            final long jobId = transcodeJob.getId();
+                    // Using the FFmpegProbeResult determine the duration of the input
+                    final double duration_ns = in.getFormat().getDuration() * TimeUnit.SECONDS.toNanos(1);
+                    final long jobId = transcodeJob.getId();
 
+                    @Override
+                    public void onProgress(FFmpegProgress progress) {
+                        double percentage = progress.getTime(TimeUnit.NANOSECONDS) / duration_ns;
+
+                        // set progress in the progressMap
+                        progressMap.put(jobId, percentage);
+
+                        // Print out interesting information about the progress
+                        logger.debug(String.format(
+                                "[%.0f%%] frame:%d fps:%.0f speed:%.2fx",
+                                percentage * 100,
+                                progress.getFrame(),
+                                progress.getFps(),
+                                progress.getSpeed()
+                        ));
+                    }
+                })
+        ;
+        
+        executor.submit(new Callable<FFmpegResultFuture>() {
             @Override
-            public void progress(Progress progress) {
-                double percentage = progress.out_time_ns / duration_ns;
-
-                // set progress in the progressMap
-                progressMap.put(jobId, percentage);
-
-                // Print out interesting information about the progress
-                logger.info(String.format(
-                        "[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx",
-                        percentage * 100,
-                        progress.status,
-                        progress.frame,
-                        FFmpegUtils.toTimecode(progress.out_time_ns, TimeUnit.NANOSECONDS),
-                        progress.fps.doubleValue(),
-                        progress.speed
-                ));
+            public FFmpegResultFuture call() throws Exception {
+                FFmpegResultFuture future = job.executeAsync();
+                runningTasks.put(transcodeJob.getId(), future);
+                return future;
             }
         });
 
-        var future = executor.submit(job);
-
         progressMap.put(transcodeJob.getId(), 0.0D);
-        submittedTasks.put(transcodeJob.getId(), job);
         jobService.setJobStatus(transcodeJob.getId(), ETranscodeServiceStatus.QUEUED);
     }
 
@@ -111,7 +111,6 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
 
     private void runHousekeepingJob() {
         TimerTask task = new TimerTask() {
-            private final Logger logger = LoggerFactory.getLogger("jobhandler-housekeeping");
             @Transactional
             public void run() {
                 logger.debug("Starting housekeeping run");
