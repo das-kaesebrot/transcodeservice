@@ -116,6 +116,6 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public double GetProgress(@PathVariable Long id) {
-        return jobHandlerService.getProgress(id);
+        return jobHandlerService.getProgress(jobRepository.getReferenceById(id));
     }
 }
