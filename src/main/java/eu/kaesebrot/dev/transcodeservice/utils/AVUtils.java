@@ -1,114 +1,32 @@
 package eu.kaesebrot.dev.transcodeservice.utils;
 
-import com.github.manevolent.ffmpeg4j.FFmpeg;
-import com.github.manevolent.ffmpeg4j.FFmpegException;
-import com.github.manevolent.ffmpeg4j.FFmpegIO;
-import com.github.manevolent.ffmpeg4j.stream.source.FFmpegSourceStream;
-import com.github.manevolent.ffmpeg4j.stream.source.SourceStream;
-import org.bytedeco.ffmpeg.avcodec.AVCodec;
-import org.bytedeco.ffmpeg.avformat.AVFormatContext;
-import org.bytedeco.ffmpeg.avformat.AVInputFormat;
-import org.bytedeco.ffmpeg.avformat.AVOutputFormat;
-import org.bytedeco.ffmpeg.global.avcodec;
-import org.bytedeco.ffmpeg.global.avformat;
-import org.bytedeco.ffmpeg.global.avutil;
-import org.bytedeco.javacpp.IntPointer;
-import org.bytedeco.javacpp.Pointer;
+import eu.kaesebrot.dev.transcodeservice.constants.EEncoderType;
+import eu.kaesebrot.dev.transcodeservice.models.core.Encoder;
+import eu.kaesebrot.dev.transcodeservice.models.core.Muxer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.EOFException;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
-import java.util.function.Function;
-
-import static org.bytedeco.ffmpeg.avcodec.AVCodecContext.FF_COMPLIANCE_STRICT;
-import static org.bytedeco.ffmpeg.global.avcodec.av_codec_is_decoder;
-import static org.bytedeco.ffmpeg.global.avcodec.av_codec_is_encoder;
-import static org.bytedeco.ffmpeg.global.avformat.avformat_query_codec;
-import static org.bytedeco.ffmpeg.global.avutil.AVMEDIA_TYPE_AUDIO;
-import static org.bytedeco.ffmpeg.global.avutil.AVMEDIA_TYPE_VIDEO;
+import java.util.concurrent.TimeUnit;
 
 public class AVUtils {
-    private static List<String> videoEncoderNames;
-    private static List<String> audioEncoderNames;
-    private static List<String> videoDecoderNames;
-    private static List<String> audioDecoderNames;
-    private static List<AVOutputFormat> muxers;
-    private static Collection<AVCodec> codecs;
-    private static Map<String, List<Integer>> supportedAudioSampleRatesPerCodec;
-    private static Map<String, List<String>> supportedVideoPixFmtsPerCodec;
-
-    public static AVInputFormat getInputFormat(String filename) {
-        AVFormatContext formatContext = new AVFormatContext(null);
-
-        try {
-            int ret = avformat.avformat_open_input(formatContext, filename, null, null);
-            if (ret < 0) {
-                throw new RuntimeException("Couldn't open given file!");
-            }
-
-            AVInputFormat inputFormat = formatContext.iformat();
-            if (inputFormat == null) {
-                avformat.avformat_close_input(formatContext);
-                throw new RuntimeException("Format probing failed!");
-            }
-
-            return inputFormat;
-
-        } finally {
-            avformat.avformat_close_input(formatContext);
-        }
-    }
+    private static List<String> videoEncoderNames = new ArrayList<>();
+    private static List<String> audioEncoderNames = new ArrayList<>();
+    private static final List<Muxer> muxers = new ArrayList<>();
+    private static final List<Encoder> encoders = new ArrayList<>();
+    private static Map<String, List<Integer>> supportedAudioSampleRatesPerCodec = new HashMap<>();
+    private static Map<String, List<String>> supportedVideoPixFmtsPerCodec = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger("AVUtils");
 
     public static List<Integer> getSupportedAudioSampleRatesForCodec(String codecName) {
-        try {
-            return getSupportedAudioSampleRatesForCodec(FFmpeg.getCodecByName(codecName));
-        } catch (FFmpegException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static double getTotalDuration(File file) {
-        double duration = 0D;
-
-        try (FFmpegSourceStream stream = FFmpegIO.openInput(file).open(getInputFormat(file.getPath()))) {
-            while (true) {
-                try {
-                    SourceStream.Packet packet = stream.readPacket();
-
-                    duration += packet.getDuration();
-
-                } catch (EOFException ex) {
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return duration;
-    }
-
-    public static List<Integer> getSupportedAudioSampleRatesForCodec(AVCodec codec) {
-        if (getSupportedAudioSampleRates().containsKey(codec.name().getString()))
-            return getSupportedAudioSampleRates().get(codec.name().getString());
-
-        return List.of();
+        return getSupportedAudioSampleRates().getOrDefault(codecName, List.of());
     }
 
     public static List<String> getSupportedPixelFormatNamesForCodec(String codecName) {
-        try {
-            return getSupportedPixelFormatNamesForCodec(FFmpeg.getCodecByName(codecName));
-        } catch (FFmpegException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static List<String> getSupportedPixelFormatNamesForCodec(AVCodec codec) {
-        if (getSupportedPixelFormatNames().containsKey(codec.name().getString()))
-            return getSupportedPixelFormatNames().get(codec.name().getString());
-
-        return List.of();
+            return getSupportedPixelFormatNames().getOrDefault(codecName, List.of());
     }
 
     public static Map<String, List<Integer>> getSupportedAudioSampleRates() {
@@ -117,23 +35,33 @@ public class AVUtils {
 
         Map<String, List<Integer>> resultMap = new TreeMap<>();
 
-        for (var codec : iterateCodecs()) {
-            if (codec.type() != AVMEDIA_TYPE_AUDIO)
+        for (var encoder : getEncoders()) {
+            if (encoder.type() != EEncoderType.AUDIO)
                 continue;
 
-            if (codec.supported_samplerates() == null)
-                continue;
+            final String search_str = "Supported sample rates";
 
-            var supportedSampleRates = new HashSet<Integer>();
-
-            IntPointer samplerates = codec.supported_samplerates();
-
-            for (int i = 0; samplerates.get(i) != -1; i++) {
-                int samplerate = samplerates.get(i);
-                supportedSampleRates.add(samplerate);
+            String sample_rates_str = null;
+            for (var line : runFFmpegProcess(List.of("-loglevel", "level+quiet", "-n", "-h", String.format("encoder=%s", encoder.name())))) {
+                if (line.contains(search_str)) {
+                    sample_rates_str = line;
+                    break;
+                }
             }
 
-            resultMap.put(codec.name().getString(), supportedSampleRates.stream().sorted().toList());
+            if (sample_rates_str == null)
+                continue;
+
+            List<Integer> sample_rates_arr = Arrays.stream(sample_rates_str
+                            .strip()
+                            .toLowerCase()
+                            .substring(search_str.length() + 1)
+                            .split(" "))
+                            .filter(item-> !item.isEmpty())
+                            .map(Integer::parseInt)
+                            .toList();
+
+            resultMap.put(encoder.name(), sample_rates_arr);
         }
 
         supportedAudioSampleRatesPerCodec = resultMap;
@@ -147,25 +75,32 @@ public class AVUtils {
 
         Map<String, List<String>> resultMap = new TreeMap<>();
 
-        for (var codec : iterateCodecs()) {
-            if (codec.type() != AVMEDIA_TYPE_VIDEO)
+        for (var encoder : getEncoders()) {
+            if (encoder.type() != EEncoderType.VIDEO)
                 continue;
 
-            if (codec.pix_fmts() == null)
-                continue;
+            final String search_str = "Supported pixel formats";
 
-            var supportedPixFormatNames = new ArrayList<String>();
-
-            IntPointer pixelFormats = codec.pix_fmts();
-
-            for (int i = 0; pixelFormats.get(i) != -1; i++) {
-                int pixelFormat = pixelFormats.get(i);
-                supportedPixFormatNames.add(avutil.av_get_pix_fmt_name(pixelFormat).getString());
+            String pix_fmt_string = null;
+            for (var line : runFFmpegProcess(List.of("-loglevel", "level+quiet", "-n", "-h", String.format("encoder=%s", encoder.name())))) {
+                if (line.contains(search_str)) {
+                    pix_fmt_string = line;
+                    break;
+                }
             }
 
-            Collections.sort(supportedPixFormatNames);
+            if (pix_fmt_string == null)
+                continue;
 
-            resultMap.put(codec.name().getString(), supportedPixFormatNames);
+            List<String> pix_fmts = Arrays.stream(pix_fmt_string
+                            .strip()
+                            .toLowerCase()
+                            .substring(search_str.length() + 1)
+                            .split(" "))
+                            .filter(item-> !item.isEmpty())
+                            .toList();
+
+            resultMap.put(encoder.name(), pix_fmts);
         }
 
         supportedVideoPixFmtsPerCodec = resultMap;
@@ -173,23 +108,11 @@ public class AVUtils {
         return supportedVideoPixFmtsPerCodec;
     }
 
-    public static <T extends Pointer> Collection<T> iterate(Function<Pointer, T> iterateFunction) {
-        Collection<T> outs = new ArrayList<>();
-        try (Pointer opaque = new Pointer()) {
-            T out;
-            while ((out = iterateFunction.apply(opaque)) != null) {
-                outs.add(out);
-            }
-        }
-        return Collections.unmodifiableCollection(outs);
-    }
-
     public static List<String> getSupportedVideoEncoders() {
         if (videoEncoderNames == null || videoEncoderNames.isEmpty()) {
-            videoEncoderNames = iterateCodecs().stream()
-                    .filter(c -> c.type() == AVMEDIA_TYPE_VIDEO)
-                    .filter(c -> av_codec_is_encoder(c) != 0)
-                    .map(c -> c.name().getString())
+            videoEncoderNames = getEncoders().stream()
+                    .filter(c -> c.type() == EEncoderType.VIDEO)
+                    .map(Encoder::name)
                     .toList();
         }
 
@@ -198,71 +121,109 @@ public class AVUtils {
 
     public static List<String> getSupportedAudioEncoders() {
         if (audioEncoderNames == null || audioEncoderNames.isEmpty()) {
-            audioEncoderNames = iterateCodecs().stream()
-                    .filter(c -> c.type() == AVMEDIA_TYPE_AUDIO)
-                    .filter(c -> av_codec_is_encoder(c) != 0)
-                    .map(c -> c.name().getString())
+            audioEncoderNames = getEncoders().stream()
+                    .filter(c -> c.type() == EEncoderType.AUDIO)
+                    .map(Encoder::name)
                     .toList();
         }
 
         return audioEncoderNames;
     }
 
-    public static List<String> getSupportedVideoDecoders() {
-        if (videoDecoderNames == null || videoDecoderNames.isEmpty()) {
-            videoDecoderNames = iterateCodecs().stream()
-                    .filter(c -> c.type() == AVMEDIA_TYPE_VIDEO)
-                    .filter(c -> av_codec_is_decoder(c) != 0)
-                    .map(c -> c.name().getString())
-                    .toList();
-        }
-
-        return videoDecoderNames;
-    }
-
-    public static List<String> getSupportedAudioDecoders() {
-        if (audioDecoderNames == null || audioDecoderNames.isEmpty()) {
-            audioDecoderNames = iterateCodecs().stream()
-                    .filter(c -> c.type() == AVMEDIA_TYPE_AUDIO)
-                    .filter(c -> av_codec_is_decoder(c) != 0)
-                    .map(c -> c.name().getString())
-                    .toList();
-        }
-
-        return audioDecoderNames;
-    }
-
     public static List<String> getSupportedMuxerNames() {
-        return getSupportedMuxers().stream().map(m -> m.name().getString()).toList();
+        return getMuxers().stream().map(Muxer::name).toList();
     }
 
-    public static List<AVOutputFormat> getSupportedMuxers() {
-        if (muxers == null || muxers.isEmpty()) {
-            muxers = iterateMuxers().stream().toList();
+    public static Collection<Muxer> getMuxers() {
+        if (!muxers.isEmpty())
+            return muxers;
+
+        for (String line : runFFmpegProcess(List.of("-loglevel", "level+quiet", "-n", "-muxers"))) {
+            line = line.strip();
+            var rows = line.split(" ");
+
+            if (rows.length < 2)
+                continue;
+
+            String name = rows[1];
+            String long_name = line.substring(2 + name.length()).strip();
+
+            muxers.add(new Muxer(name, long_name));
         }
 
         return muxers;
     }
 
-    public static boolean muxerSupportsCodec(AVOutputFormat muxer, String codecName) throws FFmpegException {
-        AVCodec codec = FFmpeg.getCodecByName(codecName);
-        return avformat_query_codec(muxer, codec.id(), FF_COMPLIANCE_STRICT) != 0;
-    }
-
-    public static Collection<AVOutputFormat> iterateMuxers() {
-        return iterate(avformat::av_muxer_iterate);
-    }
-
-    public static Collection<AVInputFormat> iterateDemuxers() {
-        return iterate(avformat::av_demuxer_iterate);
-    }
-
-    public static Collection<AVCodec> iterateCodecs() {
-        if (codecs == null || codecs.isEmpty())
+    public static Collection<Encoder> getEncoders() {
+        if (!encoders.isEmpty())
         {
-            codecs = iterate(avcodec::av_codec_iterate);
+            return encoders;
         }
 
-        return codecs;
+        int skipBeginning = 9;
+
+        for (String line : runFFmpegProcess(List.of("-loglevel", "level+quiet", "-n", "-encoders"))) {
+            if (0 < skipBeginning--) continue;
+
+            line = line.strip();
+            var rows = line.split(" ");
+
+            if (rows.length < 2)
+                continue;
+
+            String flags = rows[0].toLowerCase();
+            String name = rows[1];
+            String long_name = line.substring(flags.length() + name.length()).strip();
+
+            // Flags evaluation
+            /*
+             V..... = Video
+             A..... = Audio
+             S..... = Subtitle
+             .F.... = Frame-level multithreading
+             ..S... = Slice-level multithreading
+             ...X.. = Codec is experimental
+             ....B. = Supports draw_horiz_band
+             .....D = Supports direct rendering method 1
+            */
+            // only evaluate type for now
+            EEncoderType type = switch (flags.charAt(0)) {
+                case 'v' -> EEncoderType.VIDEO;
+                case 'a' -> EEncoderType.AUDIO;
+                case 's' -> EEncoderType.SUBTITLE;
+                default -> throw new RuntimeException("Unknown encoder flag: " + flags.charAt(0));
+            };
+
+            encoders.add(new Encoder(name, long_name, type));
+        }
+
+        return encoders;
+    }
+
+    private static List<String> runFFmpegProcess(List<String> args) {
+        List<String> lines = new ArrayList<>();
+
+        // add ffmpeg binary as the first arg
+        ArrayList<String> cmd = new ArrayList<>(args);
+        cmd.add(0, "ffmpeg");
+
+        try {
+            Process process = new ProcessBuilder(cmd).start();
+
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+
+                while ((line = input.readLine()) != null) {
+                    lines.add(line);
+                }
+            }
+
+            process.waitFor(10, TimeUnit.MILLISECONDS);
+        } catch (IOException | InterruptedException e) {
+            logger.error("Exception while running ffmpeg: ", e);
+            throw new RuntimeException(e);
+        }
+
+        return lines;
     }
 }
