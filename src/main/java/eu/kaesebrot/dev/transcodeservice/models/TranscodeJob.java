@@ -3,8 +3,6 @@ package eu.kaesebrot.dev.transcodeservice.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.manevolent.ffmpeg4j.FFmpeg;
-import com.github.manevolent.ffmpeg4j.FFmpegException;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.persistence.*;
@@ -120,18 +118,7 @@ public class TranscodeJob implements Serializable {
         var file = new File(inFile);
 
         String fileName = StringUtils.getFilenameWithoutExtension(file.getName());
-        String ext = "invalid";
-
-        try {
-            ext = FFmpeg
-                    .getOutputFormatByName(getPreset().getMuxer())
-                    .extensions()
-                    .getString()
-                    .split(",")[0];
-
-        } catch (FFmpegException e) {
-            throw new RuntimeException("Error while getting output format!", e);
-        }
+        String ext = StringUtils.getFileExtension(file.getName());
 
         return Paths.get(outFolder, fileName + "." + ext);
     }
