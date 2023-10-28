@@ -1,27 +1,28 @@
 package eu.kaesebrot.dev.transcodeservice.utils;
 
+import com.github.kokorin.jaffree.StreamType;
+import com.github.kokorin.jaffree.ffmpeg.FFmpeg;
+import com.github.kokorin.jaffree.ffmpeg.UrlInput;
+import com.github.kokorin.jaffree.ffmpeg.UrlOutput;
+import com.github.kokorin.jaffree.ffprobe.FFprobeResult;
+import com.github.kokorin.jaffree.ffprobe.Stream;
 import eu.kaesebrot.dev.transcodeservice.constants.ETrackPresetType;
 import eu.kaesebrot.dev.transcodeservice.models.AudioTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.VideoTrackPreset;
-import net.bramp.ffmpeg.FFmpegUtils;
-import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
-import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Set;
 
 public final class TranscodingUtils {
     private static final Logger logger = LoggerFactory.getLogger("TranscodingUtils");
     private TranscodingUtils() {}
 
-    public static FFmpegBuilder generateTranscoder(TranscodeJob job, FFmpegProbeResult inFileProbeResult, Set<TrackPreset> trackPresetSet) {
+    public static FFmpeg generateTranscoder(TranscodeJob job, FFprobeResult inFileProbeResult, Set<TrackPreset> trackPresetSet) {
+        var builder = FFmpegFactory.getFFmpeg();
         logger.info("Generating transcoder options");
 
         File inFile = new File(job.getInFile());
@@ -31,10 +32,6 @@ public final class TranscodingUtils {
 
         logger.debug("Generating new transcoder from preset");
 
-        FFmpegOutputBuilder builder = new FFmpegBuilder()
-                .setInput(inFileProbeResult)
-                .addOutput(job.getOutFileName().toString());
-
         VideoTrackPreset videoPreset = (VideoTrackPreset) trackPresetSet.stream()
                 .filter(t -> t.getType().equals(ETrackPresetType.VIDEO))
                 .findFirst().orElseThrow();
@@ -43,17 +40,23 @@ public final class TranscodingUtils {
                 .filter(t -> t.getType().equals(ETrackPresetType.AUDIO))
                 .findFirst().orElseThrow();
 
-        FFmpegStream inputVideoStream = inFileProbeResult.getStreams().stream()
-                .filter(t -> t.codec_type.equals(FFmpegStream.CodecType.VIDEO))
+        Stream inputVideoStream = inFileProbeResult.getStreams().stream()
+                .filter(t -> t.getCodecType().equals(StreamType.VIDEO))
                 .findFirst().orElseThrow();
 
-        FFmpegStream firstInputAudioStream = inFileProbeResult.getStreams().stream()
-                .filter(t -> t.codec_type.equals(FFmpegStream.CodecType.VIDEO))
+        Stream firstInputAudioStream = inFileProbeResult.getStreams().stream()
+                .filter(t -> t.getCodecType().equals(StreamType.AUDIO))
                 .findFirst().orElseThrow();
 
-        int width = inputVideoStream.width;
-        int height = inputVideoStream.height;
-        double frame_rate = inputVideoStream.r_frame_rate.doubleValue();
+
+        builder
+                .addInput(UrlInput.fromUrl(job.getInFile()))
+                .setOverwriteOutput(true)
+                .addArguments("-c:v", videoPreset.getVideoCodecName());
+
+        int width = inputVideoStream.getWidth();
+        int height = inputVideoStream.getHeight();
+        double frame_rate = inputVideoStream.getRFrameRate().doubleValue();
 
         if (videoPreset.getWidth() != null && videoPreset.getWidth() != width) {
             width = videoPreset.getWidth();
@@ -63,20 +66,16 @@ public final class TranscodingUtils {
         }
         if (videoPreset.getFramerate() != null && (videoPreset.getFramerate()) != frame_rate) {
             frame_rate = videoPreset.getFramerate();
+            builder.addArguments("-r", Double.toString(frame_rate));
         }
-
-        builder
-                .setVideoWidth(width)
-                .setVideoHeight(height)
-                .setVideoFrameRate(frame_rate);
 
         // TODO implement gamut, target color space
 
         if (!StringUtils.isNullOrEmpty(videoPreset.getVideoBitrate()))
-            builder.setVideoBitRate(FFmpegUtils.parseBitrate(videoPreset.getVideoBitrate()));
+            builder.addArguments("-b:v", videoPreset.getVideoBitrate());
 
         if (!StringUtils.isNullOrEmpty(videoPreset.getVideoPixelFormat()))
-            builder.setVideoPixelFormat(videoPreset.getVideoPixelFormat());
+            builder.addArguments("-pix_fmt", videoPreset.getVideoPixelFormat());
 
         logger.debug(String.format("[VIDEO] Properties: %dx%d @%fFPS", width, height, frame_rate));
         logger.debug(String.format("[VIDEO] Codec: %s", videoPreset.getVideoCodecName()));
@@ -84,18 +83,20 @@ public final class TranscodingUtils {
 
         // TODO implement support for multiple audio tracks
 
-        int samplerate = firstInputAudioStream.sample_rate;
+        int samplerate = firstInputAudioStream.getSampleRate();
 
         if (audioPreset.getAudioSampleRate() != null && audioPreset.getAudioSampleRate() != samplerate) {
             samplerate = audioPreset.getAudioSampleRate();
+            builder.addArguments("-ar", Integer.toString(samplerate));
         }
-        builder
-                .setAudioSampleRate(samplerate);
-
 
         logger.debug(String.format("[AUDIO] Properties: %s", samplerate));
         logger.debug(String.format("[AUDIO] Codec: %s", audioPreset.getAudioCodecName()));
 
-        return builder.done();
+        builder
+                .addArguments("-f", job.getPreset().getMuxer())
+                .addOutput(UrlOutput.toPath(job.getOutFileName()));
+
+        return builder;
     }
 }
