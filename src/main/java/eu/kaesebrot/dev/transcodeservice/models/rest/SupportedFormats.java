@@ -14,7 +14,7 @@ public class SupportedFormats implements Serializable {
     }
     @JsonProperty("supported_audio_encoders")
     public List<String> getSupportedAudioEncoders() {
-        return AVUtils.getSupportedAudioDecoders();
+        return AVUtils.getSupportedAudioEncoders();
     }
     @JsonProperty("supported_containers")
     public List<String> getSupportedMuxerNames() {
