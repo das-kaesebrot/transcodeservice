@@ -83,7 +83,7 @@ public class TranscodePreset implements Serializable {
     }
 
     public void setMuxer(String muxer) {
-        if (!AVUtils.getSupportedMuxers().contains(muxer)) {
+        if (!AVUtils.getSupportedMuxerNames().contains(muxer)) {
             throw new IllegalArgumentException(String.format("Given muxer '%s' is not supported!", muxer));
         }
 
