@@ -26,6 +26,6 @@ public interface TranscodeJobRepository extends JpaRepository<TranscodeJob, Long
     void updateStatus(@Param(value = "id") long id, @Param(value = "status") ETranscodeServiceStatus status);
     @Query("select t.status from TranscodeJob t where t.id = :id")
     ETranscodeServiceStatus getStatus(@Param(value = "id") long id);
-    @Query("select t.id, t.status from TranscodeJob t where t in :ids")
-    List<Object[]> findStatuses(@Param(value = "ids") Set<Long> ids);
+    @Query("select t.id, t.status from TranscodeJob t where t.id in :ids")
+    List<Object[]> findStatuses(@Param(value = "ids") Long[] ids);
 }
