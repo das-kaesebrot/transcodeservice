@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 public interface JobHandlerService {
     void submit(Long jobId);
     void submit(TranscodeJob job);
+    void abort(Long jobId);
     List<TranscodeJob> getCompletedTasks() throws NoSuchElementException;
     double getProgress(Long jobId) throws NoSuchElementException;
     double getProgress(TranscodeJob job) throws NoSuchElementException;

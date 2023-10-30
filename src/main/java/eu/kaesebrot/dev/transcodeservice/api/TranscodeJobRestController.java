@@ -95,7 +95,7 @@ public class TranscodeJobRestController {
             jobHandlerService.submit(id);
         }
         else if (status.equals(StatusPutRequest.ABORT)) {
-            throw new UnsupportedOperationException("Not supported yet");
+            jobHandlerService.abort(id);
         }
 
         return jobService.getJob(id);

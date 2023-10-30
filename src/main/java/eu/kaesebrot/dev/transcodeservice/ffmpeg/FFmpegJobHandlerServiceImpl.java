@@ -88,6 +88,16 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
     }
 
     @Override
+    public void abort(Long jobId) {
+        FFmpegResultFuture future = runningTasks.getOrDefault(jobId, null);
+        if (future != null) {
+            runningTasks.get(jobId).graceStop();
+            logger.debug(String.format("Successfully stopped job %d", jobId));
+        }
+        logger.warn(String.format("No job to stop: %d", jobId));
+    }
+
+    @Override
     public List<TranscodeJob> getCompletedTasks() throws NoSuchElementException {
         List<TranscodeJob> resultList = new ArrayList<>();
 
