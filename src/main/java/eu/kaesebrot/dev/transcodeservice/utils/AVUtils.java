@@ -209,7 +209,7 @@ public class AVUtils {
 
         // add ffmpeg binary as the first arg
         ArrayList<String> cmd = new ArrayList<>(args);
-        cmd.add(0, "ffmpeg");
+        cmd.add(0, FFmpegFactory.getFFmpegPath().toAbsolutePath().toString());
 
         try {
             Process process = new ProcessBuilder(cmd).start();
