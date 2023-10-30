@@ -77,7 +77,7 @@ public final class TranscodingUtils {
         if (!StringUtils.isNullOrEmpty(videoPreset.getVideoPixelFormat()))
             builder.addArguments("-pix_fmt", videoPreset.getVideoPixelFormat());
 
-        logger.debug(String.format("[VIDEO] Properties: %dx%d @%fFPS", width, height, frame_rate));
+        logger.debug(String.format("[VIDEO] Properties: %dx%d @%.2fFPS", width, height, frame_rate));
         logger.debug(String.format("[VIDEO] Codec: %s", videoPreset.getVideoCodecName()));
 
 
