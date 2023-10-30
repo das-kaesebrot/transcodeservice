@@ -28,13 +28,4 @@ public class TranscodePresetRestController {
         // TODO
         return presetService.insertPreset(presetCreation.generateNewPreset());
     }
-
-    @GetMapping(
-            value = "formats",
-            produces = { "application/json", "application/xml" }
-    )
-    @ResponseStatus(HttpStatus.OK)
-    public SupportedFormats GetSupportedFormats() {
-        return new SupportedFormats();
-    }
 }

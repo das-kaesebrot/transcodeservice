@@ -3,6 +3,7 @@ package eu.kaesebrot.dev.transcodeservice.utils;
 import com.github.kokorin.jaffree.ffmpeg.FFmpeg;
 import com.github.kokorin.jaffree.ffprobe.FFprobe;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public final class FFmpegFactory {
@@ -31,6 +32,20 @@ public final class FFmpegFactory {
         FFmpegFactory.fFmpegPath = path;
     }
 
+    public static Path getFFprobePath() {
+        if (fFprobePath == null)
+            fFprobePath = findExecutableInPATH("ffprobe");
+
+        return fFprobePath;
+    }
+
+    public static Path getFFmpegPath() {
+        if (fFmpegPath == null)
+            fFmpegPath = findExecutableInPATH("ffmpeg");
+
+        return fFmpegPath;
+    }
+
     public static FFmpeg getFFmpeg() {
         if (fFmpegPath != null)
             return FFmpeg.atPath(fFmpegPath);
@@ -43,5 +58,18 @@ public final class FFmpegFactory {
             return FFprobe.atPath(fFprobePath);
 
         return FFprobe.atPath();
+    }
+
+    private static Path findExecutableInPATH(String executableName) {
+        String[] pathDirectories = System.getenv("PATH").split(":");
+
+        for (String directory : pathDirectories) {
+            File executableFile = new File(directory, executableName);
+            if (executableFile.exists() && executableFile.canExecute()) {
+                return executableFile.toPath();
+            }
+        }
+
+        return null;
     }
 }
