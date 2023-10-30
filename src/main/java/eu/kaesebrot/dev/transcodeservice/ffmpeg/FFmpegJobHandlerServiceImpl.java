@@ -75,9 +75,12 @@ public class FFmpegJobHandlerServiceImpl implements JobHandlerService {
         ;
         
         executor.submit(new Callable<FFmpegResultFuture>() {
+            final FFmpeg transcoder = job;
+            final long jobId = transcodeJob.getId();
             @Override
             public FFmpegResultFuture call() throws Exception {
-                FFmpegResultFuture future = job.executeAsync();
+                logger.debug(String.format("Job %d started", jobId));
+                FFmpegResultFuture future = transcoder.executeAsync();
                 runningTasks.put(transcodeJob.getId(), future);
                 return future;
             }
