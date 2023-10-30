@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.Set;
 
 public final class TranscodingUtils {
-    private static final Logger logger = LoggerFactory.getLogger("TranscodingUtils");
+    private static final Logger logger = LoggerFactory.getLogger(TranscodingUtils.class);
     private TranscodingUtils() {}
 
     public static FFmpeg generateTranscoder(TranscodeJob job, FFprobeResult inFileProbeResult, Set<TrackPreset> trackPresetSet) {
