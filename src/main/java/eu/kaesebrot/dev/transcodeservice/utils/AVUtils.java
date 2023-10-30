@@ -138,7 +138,11 @@ public class AVUtils {
         if (!muxers.isEmpty())
             return muxers;
 
+        int skipBeginning = 4;
+
         for (String line : runFFmpegProcess(List.of("-loglevel", "level+quiet", "-n", "-muxers"))) {
+            if (0 < skipBeginning--) continue;
+
             line = line.strip();
             var rows = line.split(" ");
 
