@@ -21,7 +21,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.1'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
     implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.4.1.Final'
     implementation 'com.github.manevolent:ffmpeg4j:-SNAPSHOT'
