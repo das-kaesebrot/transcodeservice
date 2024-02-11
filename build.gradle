@@ -23,7 +23,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
     implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
-    implementation 'org.hibernate.orm:hibernate-community-dialects:6.4.2.Final'
+    implementation 'org.hibernate.orm:hibernate-community-dialects:6.4.3.Final'
     implementation 'com.github.manevolent:ffmpeg4j:-SNAPSHOT'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
