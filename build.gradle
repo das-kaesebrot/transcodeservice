@@ -25,7 +25,7 @@ dependencies {
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.5.1.Final'
     implementation 'com.github.kokorin.jaffree:jaffree:2023.09.10'
     implementation 'com.h2database:h2:2.1.214'
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
