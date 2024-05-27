@@ -1,8 +1,12 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodePresetUpdate;
+import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +40,42 @@ public class TranscodePresetServiceImpl implements TranscodePresetService {
     }
 
     @Override
+    public Page<TranscodePreset> getAllPaged(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    @Override
     public TranscodePreset insertPreset(@NotNull TranscodePreset preset) {
         return repository.saveAndFlush(preset);
+    }
+
+    @Override
+    public TranscodePreset updatePreset(TranscodePresetUpdate presetUpdate, Long id) {
+        var preset = getPreset(id);
+
+        if (!StringUtils.isNullOrEmpty(presetUpdate.getDescription())) {
+            preset.setDescription(presetUpdate.getDescription());
+        }
+
+        if (!StringUtils.isNullOrEmpty(presetUpdate.getMuxer())) {
+            preset.setMuxer(presetUpdate.getMuxer());
+        }
+
+        if (!presetUpdate.getTrackPresets().isEmpty()) {
+            preset.setTrackPresets(presetUpdate.getTrackPresets());
+        }
+
+        return updatePreset(preset);
+    }
+
+    @Override
+    public TranscodePreset updatePreset(TranscodePreset preset) {
+        getPreset(preset.getId());
+        return insertPreset(preset);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        repository.deleteById(id);
     }
 }
