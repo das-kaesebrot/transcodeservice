@@ -109,4 +109,13 @@ public class TranscodeJobRestController {
     public double GetProgress(@PathVariable Long id) {
         return jobHandlerService.getProgress(jobRepository.getReferenceById(id));
     }
+
+    @DeleteMapping(
+            value = "jobs/{id}",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void DeleteJob(@PathVariable Long id) {
+        jobService.deleteJobById(id);
+    }
 }
