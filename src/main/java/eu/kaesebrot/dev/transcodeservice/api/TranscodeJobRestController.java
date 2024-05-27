@@ -1,9 +1,10 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
 import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
-import eu.kaesebrot.dev.transcodeservice.models.rest.PingResponse;
+import eu.kaesebrot.dev.transcodeservice.ffmpeg.JobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
+import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobRepository;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobService;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
@@ -17,21 +18,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/transcodeservice")
 @Tag(name = "job", description = "The TranscodeJob API")
 public class TranscodeJobRestController {
+    private final TranscodeJobRepository jobRepository;
     private final TranscodeJobService jobService;
-
     private final TranscodePresetService presetService;
+    private final JobHandlerService jobHandlerService;
 
-    public TranscodeJobRestController(TranscodeJobService jobService, TranscodePresetService presetService) {
+    public TranscodeJobRestController(TranscodeJobRepository jobRepository, TranscodeJobService jobService, TranscodePresetService presetService, JobHandlerService jobHandlerService) {
+        this.jobRepository = jobRepository;
         this.jobService = jobService;
         this.presetService = presetService;
-    }
-
-    @GetMapping(
-            value = "ping",
-            produces = { "application/json", "application/xml" }
-    )
-    public PingResponse Ping() {
-        return new PingResponse();
+        this.jobHandlerService = jobHandlerService;
     }
 
     @GetMapping(
@@ -52,7 +48,12 @@ public class TranscodeJobRestController {
     public TranscodeJob CreateNewJob(@RequestBody TranscodeJobCreation jobData) {
         var preset = presetService.getPreset(jobData.getPresetId());
         var job = new TranscodeJob(jobData.getInFile(), jobData.getOutFolder(), preset);
-        return jobService.insertJob(job);
+        job = jobService.insertJob(job);
+
+        if (jobData.enqueueImmeditely())
+            jobHandlerService.submit(job);
+
+        return jobService.getJob(job.getId());
     }
 
     @GetMapping(
@@ -82,10 +83,10 @@ public class TranscodeJobRestController {
     @ResponseStatus(HttpStatus.OK)
     public TranscodeJob ChangeStatus(@PathVariable Long id, @RequestBody StatusPutRequest status) {
         if (status.equals(StatusPutRequest.START)) {
-            jobService.enqueueJob(id);
+            jobHandlerService.submit(id);
         }
         else if (status.equals(StatusPutRequest.ABORT)) {
-            throw new UnsupportedOperationException("Not supported yet");
+            jobHandlerService.abort(id);
         }
 
         return jobService.getJob(id);
@@ -97,6 +98,24 @@ public class TranscodeJobRestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public String GetStatus(@PathVariable Long id) {
-        return jobService.getJob(id).getStatus().name();
+        return jobRepository.getStatus(id).name();
+    }
+
+    @GetMapping(
+            value = "jobs/{id}/progress",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public double GetProgress(@PathVariable Long id) {
+        return jobHandlerService.getProgress(jobRepository.getReferenceById(id));
+    }
+
+    @DeleteMapping(
+            value = "jobs/{id}",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void DeleteJob(@PathVariable Long id) {
+        jobService.deleteJobById(id);
     }
 }

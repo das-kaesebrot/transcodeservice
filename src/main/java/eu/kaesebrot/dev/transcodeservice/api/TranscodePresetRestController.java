@@ -1,10 +1,12 @@
 package eu.kaesebrot.dev.transcodeservice.api;
 
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FfmpegUtilities;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
-import eu.kaesebrot.dev.transcodeservice.models.rest.SupportedFormats;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodePresetCreation;
+import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodePresetUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodePresetService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "preset", description = "The TranscodePreset API")
 public class TranscodePresetRestController {
     private final TranscodePresetService presetService;
-    private final FfmpegUtilities ffmpegUtilities;
 
-    public TranscodePresetRestController(TranscodePresetService presetService, FfmpegUtilities ffmpegUtilities) {
+    public TranscodePresetRestController(TranscodePresetService presetService) {
         this.presetService = presetService;
-        this.ffmpegUtilities = ffmpegUtilities;
     }
 
     @PostMapping(
@@ -26,22 +26,45 @@ public class TranscodePresetRestController {
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public TranscodePreset CreateNewPreset() {
-        return presetService.insertPreset(new TranscodePreset());
+    public TranscodePreset CreateNewPreset(@RequestBody TranscodePresetCreation presetCreation) {
+        return presetService.insertPreset(presetCreation.generateNewPreset());
     }
 
-    @GetMapping(
-            value = "formats",
+    @PatchMapping(
+            value = "presets/{id}",
+            consumes = { "application/json", "application/xml" },
             produces = { "application/json", "application/xml" }
     )
     @ResponseStatus(HttpStatus.OK)
-    public SupportedFormats GetSupportedFormates() {
-        var supportedFormats = new SupportedFormats();
+    public TranscodePreset UpdatePreset(@PathVariable Long id, @RequestBody TranscodePresetUpdate presetUpdate) {
+        return presetService.updatePreset(presetUpdate, id);
+    }
 
-        supportedFormats.setSupportedVideoEncoders(ffmpegUtilities.getSupportedVideoEncoders());
-        supportedFormats.setSupportedAudioEncoders(ffmpegUtilities.getSupportedAudioEncoders());
-        supportedFormats.setSupportedMuxerNames(ffmpegUtilities.getSupportedMuxers().stream().map(m -> m.name().getString()).toList());
+    @GetMapping(
+            value = "presets/{id}",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public TranscodePreset GetPreset(@PathVariable Long id) {
+        return presetService.getPreset(id);
+    }
 
-        return supportedFormats;
+
+    @GetMapping(
+            value = "presets",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public Page<TranscodePreset> GetAllPresets(Pageable pageable) {
+        return presetService.getAllPaged(pageable);
+    }
+
+    @DeleteMapping(
+            value = "presets/{id}",
+            produces = { "application/json", "application/xml" }
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void DeletePreset(@PathVariable Long id) {
+        presetService.deleteById(id);
     }
 }

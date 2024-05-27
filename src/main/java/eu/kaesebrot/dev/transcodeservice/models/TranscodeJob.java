@@ -1,8 +1,8 @@
 package eu.kaesebrot.dev.transcodeservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manevolent.ffmpeg4j.FFmpeg;
-import com.github.manevolent.ffmpeg4j.FFmpegException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
 import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.persistence.*;
@@ -31,22 +31,27 @@ public class TranscodeJob implements Serializable {
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "in_file", nullable = false)
+    @JsonProperty("in_file")
     private String inFile;
 
     @NotBlank(message = "{notEmpty}")
     @Column(name = "out_folder", nullable = false)
+    @JsonProperty("out_folder")
     private String outFolder;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
+    @JsonProperty("created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
+    @JsonProperty("modified_at")
     private Timestamp modifiedAt;
 
     @ManyToOne
     @JoinColumn(name = "preset_id")
+    @JsonIgnore
     private TranscodePreset preset;
 
     private ETranscodeServiceStatus status;
@@ -69,6 +74,11 @@ public class TranscodeJob implements Serializable {
 
     public ETranscodeServiceStatus getStatus() {
         return status;
+    }
+
+    @JsonProperty("preset_id")
+    public Long getPresetId() {
+        return preset.getId();
     }
 
     @Override
@@ -97,6 +107,7 @@ public class TranscodeJob implements Serializable {
         return outFolder;
     }
 
+    @JsonIgnore
     public Path getOutFileName() {
         if (StringUtils.isNullOrEmpty(inFile))
             return null;
@@ -107,20 +118,9 @@ public class TranscodeJob implements Serializable {
         var file = new File(inFile);
 
         String fileName = StringUtils.getFilenameWithoutExtension(file.getName());
-        String ext = "invalid";
+        String ext = StringUtils.getFileExtension(file.getName());
 
-        try {
-            ext = FFmpeg
-                    .getOutputFormatByName(getPreset().getMuxer())
-                    .extensions()
-                    .getString()
-                    .split(",")[0];
-
-        } catch (FFmpegException e) {
-            throw new RuntimeException("Error while getting output format!", e);
-        }
-
-        return Paths.get(outFolder, fileName + ext);
+        return Paths.get(outFolder, fileName + "." + ext);
     }
 
     public void setOutFolder(String outFolder) {
@@ -136,11 +136,11 @@ public class TranscodeJob implements Serializable {
     }
 
     public void setStatus(ETranscodeServiceStatus status) {
-        if (status.ordinal() < status.ordinal()) {
+        if (status.ordinal() < this.status.ordinal()) {
             throw new IllegalArgumentException("Status can't be set to a lower value!");
         }
 
-        status = status;
+        this.status = status;
     }
 
     public TranscodeJob(

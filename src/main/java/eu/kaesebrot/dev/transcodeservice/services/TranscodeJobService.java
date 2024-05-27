@@ -18,9 +18,8 @@ public interface TranscodeJobService
     public TranscodeJob insertJob(TranscodeJob transcodeJob);
     public TranscodeJob updateJob(TranscodeJob transcodeJob);
     public TranscodeJob updateJob(TranscodeJobUpdate updateData, Long jobId);
+    void setJobStatus(Long jobId, ETranscodeServiceStatus status);
     void setJobStatus(TranscodeJob job, ETranscodeServiceStatus status);
-    void enqueueJob(Long jobId);
-    void enqueueJob(TranscodeJob job);
     public void deleteJobById(Long id);
     public void deleteByStatusList(List<ETranscodeServiceStatus> statusList);
 }

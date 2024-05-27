@@ -6,7 +6,7 @@ plugins {
 
 group = 'eu.kaesebrot.dev'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = "21"
 
 repositories {
     mavenCentral()
@@ -21,15 +21,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.4.0'
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.5.1.Final'
-    implementation 'com.github.manevolent:ffmpeg4j:-SNAPSHOT'
+    implementation 'com.github.kokorin.jaffree:jaffree:2023.09.10'
+    implementation 'com.h2database:h2:2.1.214'
+    testImplementation 'junit:junit:4.13.1'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'org.postgresql:postgresql'
 }
 
 test {
     useJUnitPlatform()
 }
+targetCompatibility = JavaVersion.VERSION_21

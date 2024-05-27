@@ -1,39 +1,31 @@
 package eu.kaesebrot.dev.transcodeservice.models.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 public class SupportedFormats implements Serializable {
     @JsonProperty("supported_video_encoders")
-    private List<String> supportedVideoEncoders;
-    @JsonProperty("supported_audio_encoders")
-    private List<String> supportedAudioEncoders;
-    @JsonProperty("supported_containers")
-    private List<String> supportedMuxerNames;
-
     public List<String> getSupportedVideoEncoders() {
-        return supportedVideoEncoders;
+        return AVUtils.getSupportedVideoEncoders();
     }
-
-    public void setSupportedVideoEncoders(List<String> supportedVideoEncoders) {
-        this.supportedVideoEncoders = supportedVideoEncoders;
-    }
-
+    @JsonProperty("supported_audio_encoders")
     public List<String> getSupportedAudioEncoders() {
-        return supportedAudioEncoders;
+        return AVUtils.getSupportedAudioEncoders();
     }
-
-    public void setSupportedAudioEncoders(List<String> supportedAudioEncoders) {
-        this.supportedAudioEncoders = supportedAudioEncoders;
-    }
-
+    @JsonProperty("supported_containers")
     public List<String> getSupportedMuxerNames() {
-        return supportedMuxerNames;
+        return AVUtils.getSupportedMuxerNames();
     }
-
-    public void setSupportedMuxerNames(List<String> supportedMuxerNames) {
-        this.supportedMuxerNames = supportedMuxerNames;
+    @JsonProperty("supported_pixel_formats_for_codec")
+    public Map<String, List<String>> getSupportedPixelFormatsMap() {
+        return AVUtils.getSupportedPixelFormatNames();
+    }
+    @JsonProperty("supported_audio_samplerates_for_codec")
+    public Map<String, List<Integer>> getSupportedSampleratesMap() {
+        return AVUtils.getSupportedAudioSampleRates();
     }
 }

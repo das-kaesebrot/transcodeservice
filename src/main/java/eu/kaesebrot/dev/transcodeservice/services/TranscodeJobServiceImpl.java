@@ -1,8 +1,6 @@
 package eu.kaesebrot.dev.transcodeservice.services;
 
 import eu.kaesebrot.dev.transcodeservice.constants.ETranscodeServiceStatus;
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegCallable;
-import eu.kaesebrot.dev.transcodeservice.ffmpeg.FFmpegJobHandlerService;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodeJob;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,18 +17,17 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
+@Transactional
 public class TranscodeJobServiceImpl implements TranscodeJobService
 {
-    private final ITranscodeJobRepository jobRepository;
-    private final ITranscodePresetRepository presetRepository;
-    private final FFmpegJobHandlerService jobHandlerService;
+    private final TranscodeJobRepository jobRepository;
+    private final TranscodePresetRepository presetRepository;
     private final ReadWriteLock jobLock;
 
-    public TranscodeJobServiceImpl(ITranscodeJobRepository jobRepository, ITranscodePresetRepository presetRepository, FFmpegJobHandlerService jobHandlerService) {
+    public TranscodeJobServiceImpl(TranscodeJobRepository jobRepository, TranscodePresetRepository presetRepository) {
         jobLock = new ReentrantReadWriteLock();
         this.jobRepository = jobRepository;
         this.presetRepository = presetRepository;
-        this.jobHandlerService = jobHandlerService;
     }
 
     @Override
@@ -74,26 +72,19 @@ public class TranscodeJobServiceImpl implements TranscodeJobService
     }
 
     @Override
+    public void setJobStatus(Long jobId, ETranscodeServiceStatus status) {
+        jobRepository.updateStatus(jobId, status);
+    }
+
+    @Override
     public void setJobStatus(@NotNull TranscodeJob job, ETranscodeServiceStatus status) {
         try {
             jobLock.writeLock().lock();
 
-            job.setStatus(status);
-            jobRepository.saveAndFlush(job);
-
+            jobRepository.updateStatus(job.getId(), status);
         } finally {
             jobLock.writeLock().unlock();
         }
-    }
-
-    @Override
-    public void enqueueJob(Long jobId) {
-        enqueueJob(getJob(jobId));
-    }
-
-    @Override
-    public void enqueueJob(TranscodeJob job) {
-        jobHandlerService.submit(new FFmpegCallable(job));
     }
 
     @Override
