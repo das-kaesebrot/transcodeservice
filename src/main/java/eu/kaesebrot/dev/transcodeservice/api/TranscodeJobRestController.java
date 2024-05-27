@@ -2,7 +2,6 @@ package eu.kaesebrot.dev.transcodeservice.api;
 
 import eu.kaesebrot.dev.transcodeservice.constants.StatusPutRequest;
 import eu.kaesebrot.dev.transcodeservice.ffmpeg.JobHandlerService;
-import eu.kaesebrot.dev.transcodeservice.models.rest.PingResponse;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobCreation;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodeJobUpdate;
 import eu.kaesebrot.dev.transcodeservice.services.TranscodeJobRepository;
@@ -29,14 +28,6 @@ public class TranscodeJobRestController {
         this.jobService = jobService;
         this.presetService = presetService;
         this.jobHandlerService = jobHandlerService;
-    }
-
-    @GetMapping(
-            value = "ping",
-            produces = { "application/json", "application/xml" }
-    )
-    public PingResponse Ping() {
-        return new PingResponse();
     }
 
     @GetMapping(
