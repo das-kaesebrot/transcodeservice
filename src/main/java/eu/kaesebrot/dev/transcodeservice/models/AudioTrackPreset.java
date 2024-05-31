@@ -6,6 +6,7 @@ import eu.kaesebrot.dev.transcodeservice.utils.AVUtils;
 import eu.kaesebrot.dev.transcodeservice.utils.StringUtils;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.lang.Nullable;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 
 @Embeddable
 public class AudioTrackPreset extends TrackPreset {
+    @NotNull
     @JsonProperty("audio_codec")
     private String audioCodecName;
     @Nullable
