@@ -6,6 +6,7 @@ import eu.kaesebrot.dev.transcodeservice.models.TrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.TranscodePreset;
 import eu.kaesebrot.dev.transcodeservice.models.VideoTrackPreset;
 import eu.kaesebrot.dev.transcodeservice.models.rest.TranscodePresetCreation;
+import helper.DataHelper;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -28,46 +29,14 @@ public class PresetApiTests {
     @Test
     @Transactional
     public void testPresetCreation() {
-        // video track preset
-        Double framerate = 25.0;
-        String videoBitrate = "10m";
-        Integer width = 1920;
-        Integer height = 1080;
-        String videoCodec = "libx264";
-        String pixelFormat = "yuv420p";
-
-        VideoTrackPreset videoTrackPreset = new VideoTrackPreset();
-        videoTrackPreset.setFramerate(framerate);
-        videoTrackPreset.setVideoBitrate(videoBitrate);
-        videoTrackPreset.setWidth(width);
-        videoTrackPreset.setHeight(height);
-        videoTrackPreset.setVideoCodecName(videoCodec);
-        videoTrackPreset.setVideoPixelFormat(pixelFormat);
-
-        // audio track preset
-        String audioBitrate = "192k";
-        String audioCodec = "aac";
-        Integer audioSampleRate = 44100;
-
-        AudioTrackPreset audioTrackPreset = new AudioTrackPreset();
-        audioTrackPreset.setAudioBitrate(audioBitrate);
-        audioTrackPreset.setAudioCodecName(audioCodec);
-        audioTrackPreset.setAudioSampleRate(audioSampleRate);
-
-        // the preset creation model itself
-        String description = "h264 testing preset";
-        String muxer = "mp4";
-
-        TranscodePresetCreation creationPreset = new TranscodePresetCreation();
-
-        creationPreset.setDescription(description);
-        creationPreset.setMuxer(muxer);
-        creationPreset.setTrackPresets(Set.of(videoTrackPreset, audioTrackPreset));
+        TranscodePresetCreation creationPreset = DataHelper.getCreationPreset();
+        VideoTrackPreset videoTrackPreset = DataHelper.getVideoTrackPreset();
+        AudioTrackPreset audioTrackPreset = DataHelper.getAudioTrackPreset();
 
         TranscodePreset resp = presetController.CreateNewPreset(creationPreset);
 
-        Assert.assertEquals(description, resp.getDescription());
-        Assert.assertEquals(muxer, resp.getMuxer());
+        Assert.assertEquals(creationPreset.getDescription(), resp.getDescription());
+        Assert.assertEquals(creationPreset.getMuxer(), resp.getMuxer());
         Assert.assertNotNull(resp.getCreatedAt());
         Assert.assertNotNull(resp.getModifiedAt());
         Assert.assertNotNull(resp.getId());
@@ -76,17 +45,17 @@ public class PresetApiTests {
         VideoTrackPreset respVideoTrackPreset = (VideoTrackPreset) respTrackPresets.stream().filter(s -> s.getType() == ETrackPresetType.VIDEO).findFirst().orElseThrow();
         AudioTrackPreset respAudioTrackPreset = (AudioTrackPreset) respTrackPresets.stream().filter(s -> s.getType() == ETrackPresetType.AUDIO).findFirst().orElseThrow();
 
-        Assert.assertEquals(framerate, respVideoTrackPreset.getFramerate());
-        Assert.assertEquals(videoBitrate, respVideoTrackPreset.getVideoBitrate());
-        Assert.assertEquals(width, respVideoTrackPreset.getWidth());
-        Assert.assertEquals(height, respVideoTrackPreset.getHeight());
-        Assert.assertEquals(videoCodec, respVideoTrackPreset.getVideoCodecName());
-        Assert.assertEquals(pixelFormat, respVideoTrackPreset.getVideoPixelFormat());
+        Assert.assertEquals(videoTrackPreset.getFramerate(), respVideoTrackPreset.getFramerate());
+        Assert.assertEquals(videoTrackPreset.getVideoBitrate(), respVideoTrackPreset.getVideoBitrate());
+        Assert.assertEquals(videoTrackPreset.getWidth(), respVideoTrackPreset.getWidth());
+        Assert.assertEquals(videoTrackPreset.getHeight(), respVideoTrackPreset.getHeight());
+        Assert.assertEquals(videoTrackPreset.getVideoCodecName(), respVideoTrackPreset.getVideoCodecName());
+        Assert.assertEquals(videoTrackPreset.getVideoPixelFormat(), respVideoTrackPreset.getVideoPixelFormat());
         Assert.assertTrue(respVideoTrackPreset.getVideoOptions() == null || respVideoTrackPreset.getVideoOptions().isEmpty());
 
-        Assert.assertEquals(audioBitrate, respAudioTrackPreset.getAudioBitrate());
-        Assert.assertEquals(audioCodec, respAudioTrackPreset.getAudioCodecName());
-        Assert.assertEquals(audioSampleRate, respAudioTrackPreset.getAudioSampleRate());
+        Assert.assertEquals(audioTrackPreset.getAudioBitrate(), respAudioTrackPreset.getAudioBitrate());
+        Assert.assertEquals(audioTrackPreset.getAudioCodecName(), respAudioTrackPreset.getAudioCodecName());
+        Assert.assertEquals(audioTrackPreset.getAudioSampleRate(), respAudioTrackPreset.getAudioSampleRate());
         Assert.assertTrue(respAudioTrackPreset.getAudioOptions() == null || respAudioTrackPreset.getAudioOptions().isEmpty());
     }
 }
