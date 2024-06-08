@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 public class TranscodePresetCreation implements Serializable {
+    @NotNull
     private String description;
     @NotNull
     @JsonProperty("container")
