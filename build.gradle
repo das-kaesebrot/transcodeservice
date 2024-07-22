@@ -24,7 +24,7 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.5.2.Final'
     implementation 'com.github.kokorin.jaffree:jaffree:2023.09.10'
-    implementation 'com.h2database:h2:2.2.224'
+    implementation 'com.h2database:h2:2.3.230'
     testImplementation 'junit:junit:4.13.2'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
